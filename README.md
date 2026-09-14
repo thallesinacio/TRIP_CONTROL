@@ -1,6 +1,6 @@
 # TripControl
 
-Sistema desktop **100% local** de gestao para agencias de turismo — projeto da
+Sistema desktop **100% local** de gestão para agencias de turismo — projeto da
 disciplina de Engenharia de Software II (UNIVASF, 2026.2).
 
 | Item | Definicao |
@@ -15,7 +15,7 @@ disciplina de Engenharia de Software II (UNIVASF, 2026.2).
 
 ## Como rodar
 
-Pre-requisitos: JDK 21 e Maven 3.9+ (o IntelliJ ja traz um Maven embutido).
+Pré-requisitos: JDK 21 e Maven 3.9+ (o IntelliJ ja traz um Maven embutido).
 
 ```bash
 mvn clean javafx:run
