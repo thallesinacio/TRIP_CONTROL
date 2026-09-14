@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tripcontrol.view.EmConstrucaoController"
+      styleClass="cartao" spacing="12.0" alignment="CENTER">
+    <padding>
+        <Insets top="64.0" right="32.0" bottom="64.0" left="32.0"/>
+    </padding>
+    <Label text="Em construcao" styleClass="titulo-secao"/>
+    <Label fx:id="lblAviso" wrapText="true" styleClass="texto-secundario" textAlignment="CENTER"/>
+</VBox>

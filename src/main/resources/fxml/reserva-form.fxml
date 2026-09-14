@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<GridPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.tripcontrol.view.ReservaFormController"
+          hgap="24.0">
+    <columnConstraints>
+        <ColumnConstraints percentWidth="62.0"/>
+        <ColumnConstraints percentWidth="38.0"/>
+    </columnConstraints>
+
+    <!-- Formulario da reserva -->
+    <VBox styleClass="cartao" spacing="18.0" GridPane.columnIndex="0">
+        <padding>
+            <Insets top="28.0" right="32.0" bottom="28.0" left="32.0"/>
+        </padding>
+
+        <Label text="Dados da Reserva" styleClass="titulo-secao"/>
+
+        <VBox spacing="6.0">
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label text="Selecionar Cliente" styleClass="rotulo-campo"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnNovoCliente" text="Cliente nao cadastrado?"
+                        onAction="#aoCadastrarNovoCliente" styleClass="botao-link"/>
+            </HBox>
+            <ComboBox fx:id="cboCliente" maxWidth="Infinity" promptText="Selecione o cliente"/>
+            <Label fx:id="lblErroCliente" styleClass="mensagem-erro" managed="false" visible="false"/>
+        </VBox>
+
+        <VBox spacing="6.0">
+            <Label text="Selecionar Pacote de Viagem" styleClass="rotulo-campo"/>
+            <ComboBox fx:id="cboPacote" maxWidth="Infinity" promptText="Selecione o pacote"/>
+            <Label fx:id="lblErroPacote" styleClass="mensagem-erro" managed="false" visible="false"/>
+        </VBox>
+
+        <GridPane hgap="20.0" vgap="6.0">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="34.0"/>
+                <ColumnConstraints percentWidth="33.0"/>
+                <ColumnConstraints percentWidth="33.0"/>
+            </columnConstraints>
+            <VBox spacing="6.0" GridPane.columnIndex="0">
+                <Label text="Quantidade de Viajantes" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtQuantidadeViajantes" promptText="Ex: 2"/>
+                <Label fx:id="lblErroQuantidade" styleClass="mensagem-erro" managed="false"
+                       visible="false" wrapText="true"/>
+            </VBox>
+            <VBox spacing="6.0" GridPane.columnIndex="1">
+                <Label text="Inicio da Viagem" styleClass="rotulo-campo"/>
+                <DatePicker fx:id="dpDataInicio" maxWidth="Infinity"/>
+                <Label fx:id="lblErroDataInicio" styleClass="mensagem-erro" managed="false"
+                       visible="false" wrapText="true"/>
+            </VBox>
+            <VBox spacing="6.0" GridPane.columnIndex="2">
+                <Label text="Fim da Viagem" styleClass="rotulo-campo"/>
+                <DatePicker fx:id="dpDataFim" maxWidth="Infinity"/>
+                <Label fx:id="lblErroDataFim" styleClass="mensagem-erro" managed="false"
+                       visible="false" wrapText="true"/>
+            </VBox>
+        </GridPane>
+
+        <VBox spacing="6.0">
+            <Label text="Observacoes de Viagem" styleClass="rotulo-campo"/>
+            <TextArea fx:id="txtObservacoes" prefRowCount="4" wrapText="true"
+                      promptText="Solicitacoes especiais, alergias alimentares ou restricoes de mobilidade..."/>
+        </VBox>
+
+        <HBox spacing="12.0" alignment="CENTER_RIGHT">
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="btnCancelarReserva" text="Cancelar" onAction="#aoCancelar" styleClass="botao-secundario"/>
+            <Button fx:id="btnConfirmarReserva" text="Confirmar Reserva" onAction="#aoConfirmarReserva"
+                    defaultButton="true" styleClass="botao-primario"/>
+        </HBox>
+    </VBox>
+
+    <!-- Resumo do pacote selecionado -->
+    <VBox styleClass="cartao-resumo" spacing="14.0" GridPane.columnIndex="1">
+        <padding>
+            <Insets top="28.0" right="28.0" bottom="28.0" left="28.0"/>
+        </padding>
+        <Label text="Resumo do Pacote" styleClass="resumo-titulo"/>
+
+        <Label text="DESTINO ESCOLHIDO" styleClass="resumo-rotulo"/>
+        <Label fx:id="lblResumoDestino" wrapText="true" styleClass="resumo-valor-destaque"/>
+
+        <Label text="PRECO UNITARIO" styleClass="resumo-rotulo"/>
+        <Label fx:id="lblResumoPreco" styleClass="resumo-valor-destaque"/>
+
+        <Label text="VAGAS DISPONIVEIS" styleClass="resumo-rotulo"/>
+        <Label fx:id="lblResumoVagas" styleClass="resumo-valor"/>
+
+        <Label text="ROTEIRO BASE" styleClass="resumo-rotulo"/>
+        <Label fx:id="lblResumoRoteiro" wrapText="true" styleClass="resumo-valor"/>
+
+        <Region VBox.vgrow="ALWAYS"/>
+        <Label text="TOTAL ESTIMADO DA RESERVA" styleClass="resumo-rotulo"/>
+        <Label fx:id="lblResumoTotal" styleClass="resumo-total"/>
+    </VBox>
+</GridPane>

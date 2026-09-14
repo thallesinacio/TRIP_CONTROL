@@ -1,0 +1,353 @@
+/*
+ * Identidade visual do TripControl, derivada do prototipo do Figma:
+ * verde-petroleo como cor de marca, fundo claro e cartoes brancos.
+ */
+
+.root {
+    -fx-font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+    -cor-marca: #0F766E;
+    -cor-marca-escura: #115E59;
+    -cor-menta: #CCFBF1;
+    -cor-menta-forte: #99F6E4;
+    -cor-fundo: #F1F5F9;
+    -cor-texto: #0F172A;
+    -cor-texto-secundario: #64748B;
+    -cor-borda: #E2E8F0;
+    -cor-erro: #DC2626;
+    -fx-background-color: -cor-fundo;
+}
+
+/* ----------------------------- Login ----------------------------- */
+
+.tela-login {
+    -fx-background-color: white;
+}
+
+.painel-marca {
+    -fx-background-color: -cor-marca;
+}
+
+.marca-icone {
+    -fx-background-color: white;
+    -fx-text-fill: -cor-marca;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 16 6 16;
+    -fx-background-radius: 10;
+}
+
+.marca-nome {
+    -fx-text-fill: white;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.cartao-marca {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 16;
+}
+
+.marca-titulo {
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+}
+
+.marca-subtitulo {
+    -fx-text-fill: -cor-menta;
+    -fx-font-size: 14px;
+}
+
+.selo-local {
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+    -fx-text-fill: white;
+    -fx-padding: 6 14 6 14;
+    -fx-background-radius: 20;
+}
+
+.painel-formulario {
+    -fx-background-color: #F8FAFC;
+}
+
+.rotulo-secao-destaque {
+    -fx-text-fill: -cor-marca;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.titulo-principal {
+    -fx-text-fill: -cor-texto;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+}
+
+.link-discreto {
+    -fx-text-fill: -cor-marca;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.texto-rodape {
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-size: 11px;
+}
+
+/* --------------------------- Area logada -------------------------- */
+
+.janela-principal {
+    -fx-background-color: -cor-fundo;
+}
+
+.menu-lateral {
+    -fx-background-color: white;
+    -fx-border-color: transparent -cor-borda transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.menu-marca-nome {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -cor-texto;
+}
+
+.menu-marca-sub {
+    -fx-font-size: 10px;
+    -fx-text-fill: -cor-texto-secundario;
+}
+
+.item-menu {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cor-texto;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 11 16 11 16;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.item-menu:hover {
+    -fx-background-color: #F1F5F9;
+}
+
+.item-menu:selected {
+    -fx-background-color: -cor-menta;
+    -fx-text-fill: -cor-marca-escura;
+    -fx-font-weight: bold;
+}
+
+.status-banco {
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-size: 11px;
+}
+
+.status-versao {
+    -fx-text-fill: #94A3B8;
+    -fx-font-size: 10px;
+}
+
+.cabecalho {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent -cor-borda transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.titulo-tela {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -cor-texto;
+}
+
+.subtitulo-tela {
+    -fx-font-size: 13px;
+    -fx-text-fill: -cor-texto-secundario;
+}
+
+.chip-usuario {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: -cor-texto;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 20;
+}
+
+.area-rolagem {
+    -fx-background-color: transparent;
+}
+
+.area-rolagem > .viewport {
+    -fx-background-color: transparent;
+}
+
+.area-conteudo {
+    -fx-background-color: -cor-fundo;
+}
+
+/* ----------------------------- Cartoes ---------------------------- */
+
+.cartao {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.06), 12, 0, 0, 3);
+}
+
+.titulo-secao {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -cor-texto;
+}
+
+.rotulo-campo {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #334155;
+}
+
+.texto-secundario {
+    -fx-text-fill: -cor-texto-secundario;
+}
+
+.mensagem-erro {
+    -fx-text-fill: -cor-erro;
+    -fx-font-size: 11px;
+}
+
+/* ----------------------------- Campos ----------------------------- */
+
+.text-field,
+.password-field,
+.text-area,
+.combo-box,
+.date-picker {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: -cor-borda;
+    -fx-border-width: 1;
+    -fx-background-color: white;
+    -fx-padding: 8 12 8 12;
+}
+
+.text-area {
+    -fx-padding: 4;
+}
+
+.text-area .content {
+    -fx-background-radius: 10;
+}
+
+.text-field:focused,
+.password-field:focused,
+.text-area:focused,
+.combo-box:focused,
+.date-picker:focused {
+    -fx-border-color: -cor-marca;
+}
+
+.campo-invalido {
+    -fx-border-color: -cor-erro;
+}
+
+/* ----------------------------- Botoes ----------------------------- */
+
+.botao-primario {
+    -fx-background-color: -cor-marca;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 11 26 11 26;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.botao-primario:hover {
+    -fx-background-color: -cor-marca-escura;
+}
+
+.botao-secundario {
+    -fx-background-color: white;
+    -fx-text-fill: -cor-texto;
+    -fx-border-color: -cor-borda;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10 22 10 22;
+    -fx-cursor: hand;
+}
+
+.botao-secundario:hover {
+    -fx-background-color: #F8FAFC;
+}
+
+.botao-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cor-marca;
+    -fx-underline: true;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+/* -------------------- Preferencias e historico -------------------- */
+
+.tag-preferencia {
+    -fx-background-color: -cor-menta;
+    -fx-background-radius: 20;
+    -fx-padding: 5 10 5 14;
+}
+
+.tag-preferencia .label {
+    -fx-text-fill: -cor-marca-escura;
+}
+
+.botao-remover-tag {
+    -fx-background-color: transparent;
+    -fx-text-fill: -cor-marca-escura;
+    -fx-padding: 0 4 0 4;
+    -fx-cursor: hand;
+}
+
+.painel-historico {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 12;
+}
+
+.historico-destino {
+    -fx-font-weight: bold;
+    -fx-text-fill: -cor-texto;
+}
+
+.historico-status {
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-size: 11px;
+}
+
+/* ------------------------ Resumo da reserva ----------------------- */
+
+.cartao-resumo {
+    -fx-background-color: -cor-marca;
+    -fx-background-radius: 16;
+}
+
+.resumo-titulo {
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+
+.resumo-rotulo {
+    -fx-text-fill: -cor-menta-forte;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.resumo-valor {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+}
+
+.resumo-valor-destaque {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.resumo-total {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}

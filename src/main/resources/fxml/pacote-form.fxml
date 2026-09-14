@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tripcontrol.view.PacoteFormController"
+      styleClass="cartao" spacing="18.0">
+    <padding>
+        <Insets top="28.0" right="32.0" bottom="28.0" left="32.0"/>
+    </padding>
+
+    <Label fx:id="lblSecao" text="Informacoes Principais" styleClass="titulo-secao"/>
+
+    <VBox spacing="6.0">
+        <Label text="Destino" styleClass="rotulo-campo"/>
+        <TextField fx:id="txtDestino" promptText="Ex: Paris, Franca ou Fernando de Noronha, BR"/>
+        <Label fx:id="lblErroDestino" styleClass="mensagem-erro" managed="false" visible="false"/>
+    </VBox>
+
+    <GridPane hgap="20.0" vgap="6.0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="50.0"/>
+            <ColumnConstraints percentWidth="50.0"/>
+        </columnConstraints>
+        <VBox spacing="6.0" GridPane.columnIndex="0">
+            <Label text="Data de Inicio" styleClass="rotulo-campo"/>
+            <DatePicker fx:id="dpDataInicio" maxWidth="Infinity"/>
+            <Label fx:id="lblErroDataInicio" styleClass="mensagem-erro" managed="false" visible="false"/>
+        </VBox>
+        <VBox spacing="6.0" GridPane.columnIndex="1">
+            <Label text="Data de Fim" styleClass="rotulo-campo"/>
+            <DatePicker fx:id="dpDataFim" maxWidth="Infinity"/>
+            <Label fx:id="lblErroDataFim" styleClass="mensagem-erro" managed="false" visible="false"/>
+        </VBox>
+    </GridPane>
+
+    <VBox spacing="6.0">
+        <Label text="Descricao" styleClass="rotulo-campo"/>
+        <TextArea fx:id="txtDescricao" prefRowCount="3" wrapText="true"
+                  promptText="Descreva brevemente os destaques da viagem e o publico-alvo..."/>
+    </VBox>
+
+    <GridPane hgap="20.0" vgap="6.0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="50.0"/>
+            <ColumnConstraints percentWidth="50.0"/>
+        </columnConstraints>
+        <VBox spacing="6.0" GridPane.columnIndex="0">
+            <Label text="Preco (R$)" styleClass="rotulo-campo"/>
+            <TextField fx:id="txtPreco" promptText="R$ 0,00"/>
+            <Label fx:id="lblErroPreco" styleClass="mensagem-erro" managed="false" visible="false"/>
+        </VBox>
+        <VBox spacing="6.0" GridPane.columnIndex="1">
+            <Label text="Capacidade Total de Vagas" styleClass="rotulo-campo"/>
+            <TextField fx:id="txtCapacidadeTotal" promptText="Ex: 24"/>
+            <Label fx:id="lblErroCapacidade" styleClass="mensagem-erro" managed="false" visible="false"/>
+        </VBox>
+    </GridPane>
+
+    <VBox spacing="6.0">
+        <Label text="Roteiro Previsto (Dia a Dia)" styleClass="rotulo-campo"/>
+        <TextArea fx:id="txtRoteiroPrevisto" prefRowCount="5" wrapText="true"
+                  promptText="Dia 1: Chegada e Check-in&#10;Dia 2: Tour guiado pelos principais pontos historicos&#10;Dia 3: Dia livre para atividades opcionais..."/>
+    </VBox>
+
+    <HBox spacing="12.0" alignment="CENTER_RIGHT">
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnCancelarPacote" text="Cancelar" onAction="#aoCancelar" styleClass="botao-secundario"/>
+        <Button fx:id="btnSalvarPacote" text="Salvar Pacote" onAction="#aoSalvarPacote"
+                defaultButton="true" styleClass="botao-primario"/>
+    </HBox>
+</VBox>

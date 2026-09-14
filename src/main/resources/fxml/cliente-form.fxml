@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tripcontrol.view.ClienteFormController"
+      styleClass="cartao" spacing="18.0">
+    <padding>
+        <Insets top="28.0" right="32.0" bottom="28.0" left="32.0"/>
+    </padding>
+
+    <Label fx:id="lblSecao" text="Ficha de Cadastro do Cliente" styleClass="titulo-secao"/>
+
+    <VBox spacing="6.0">
+        <Label text="Nome Completo" styleClass="rotulo-campo"/>
+        <TextField fx:id="txtNome" promptText="Ex: Mariana Silva de Oliveira"/>
+        <Label fx:id="lblErroNome" styleClass="mensagem-erro" managed="false" visible="false"/>
+    </VBox>
+
+    <GridPane hgap="20.0" vgap="6.0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="33.0"/>
+            <ColumnConstraints percentWidth="33.0"/>
+            <ColumnConstraints percentWidth="34.0"/>
+        </columnConstraints>
+        <VBox spacing="6.0" GridPane.columnIndex="0">
+            <Label text="CPF" styleClass="rotulo-campo"/>
+            <TextField fx:id="txtCpf" promptText="000.000.000-00"/>
+            <Label fx:id="lblErroCpf" styleClass="mensagem-erro" managed="false" visible="false" wrapText="true"/>
+        </VBox>
+        <VBox spacing="6.0" GridPane.columnIndex="1">
+            <Label text="Telefone" styleClass="rotulo-campo"/>
+            <TextField fx:id="txtTelefone" promptText="(11) 99999-0000"/>
+            <Label fx:id="lblErroTelefone" styleClass="mensagem-erro" managed="false" visible="false" wrapText="true"/>
+        </VBox>
+        <VBox spacing="6.0" GridPane.columnIndex="2">
+            <Label text="E-mail" styleClass="rotulo-campo"/>
+            <TextField fx:id="txtEmail" promptText="exemplo@email.com"/>
+            <Label fx:id="lblErroEmail" styleClass="mensagem-erro" managed="false" visible="false" wrapText="true"/>
+        </VBox>
+    </GridPane>
+
+    <VBox spacing="6.0">
+        <Label text="Endereco Residencial" styleClass="rotulo-campo"/>
+        <TextField fx:id="txtEndereco" promptText="Rua, Numero, Bairro, Cidade - UF"/>
+    </VBox>
+
+    <VBox spacing="8.0">
+        <Label text="Preferencias de Viagem" styleClass="rotulo-campo"/>
+        <FlowPane fx:id="painelPreferencias" hgap="8.0" vgap="8.0">
+            <Button fx:id="btnAdicionarPreferencia" text="+ Adicionar Preferencia"
+                    onAction="#aoAdicionarPreferencia" styleClass="botao-secundario"/>
+        </FlowPane>
+    </VBox>
+
+    <VBox spacing="8.0">
+        <Label text="Historico de Viagens (Somente Leitura)" styleClass="rotulo-campo"/>
+        <VBox fx:id="listaHistorico" spacing="6.0" styleClass="painel-historico">
+            <padding>
+                <Insets top="14.0" right="16.0" bottom="14.0" left="16.0"/>
+            </padding>
+        </VBox>
+    </VBox>
+
+    <HBox spacing="12.0" alignment="CENTER_RIGHT">
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnCancelarCliente" text="Cancelar" onAction="#aoCancelar" styleClass="botao-secundario"/>
+        <Button fx:id="btnSalvarCliente" text="Salvar" onAction="#aoSalvarCliente"
+                defaultButton="true" styleClass="botao-primario"/>
+    </HBox>
+</VBox>
