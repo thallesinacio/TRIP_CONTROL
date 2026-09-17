@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -17,8 +18,20 @@ import java.util.Optional;
 public final class Formatadores {
 
     public static final Locale BRASIL = Locale.forLanguageTag("pt-BR");
-    public static final DateTimeFormatter DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    public static final DateTimeFormatter DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    /**
+     * Formato de data do sistema.
+     *
+     * <p>Usa {@link ResolverStyle#STRICT} (e por isso o padrao de ano e {@code uuuu},
+     * exigido pelo modo estrito) para que datas inexistentes sejam recusadas em vez
+     * de silenciosamente ajustadas: no modo padrao, "31/02/2026" viraria 28/02/2026,
+     * o que faria o sistema aceitar um periodo que o funcionario nao digitou.</p>
+     */
+    public static final DateTimeFormatter DATA =
+            DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
+
+    public static final DateTimeFormatter DATA_HORA =
+            DateTimeFormatter.ofPattern("dd/MM/uuuu HH:mm").withResolverStyle(ResolverStyle.STRICT);
 
     private Formatadores() {
     }

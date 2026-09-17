@@ -20,14 +20,22 @@ import com.tripcontrol.repository.memory.InMemoryParcelaRepository;
 import com.tripcontrol.repository.memory.InMemoryRecursoRepository;
 import com.tripcontrol.repository.memory.InMemoryReservaRepository;
 import com.tripcontrol.repository.memory.InMemoryUsuarioRepository;
+import com.tripcontrol.repository.jdbc.JdbcClienteRepository;
+import com.tripcontrol.repository.jdbc.JdbcPacoteRepository;
+import com.tripcontrol.repository.jdbc.JdbcReservaRepository;
+import com.tripcontrol.repository.jdbc.JdbcUsuarioRepository;
+import com.tripcontrol.util.ConexaoIndisponivelException;
+import com.tripcontrol.util.ConfiguracaoAplicacao;
+import com.tripcontrol.util.ConnectionFactory;
+import com.tripcontrol.util.Migracoes;
 
 /**
  * Ponto unico de montagem das dependencias da aplicacao (injecao manual).
  *
- * <p><strong>Este e o unico arquivo que precisara mudar quando o banco entrar.</strong>
- * Trocar {@code new InMemoryPacoteRepository()} por {@code new JdbcPacoteRepository(...)}
- * -- e assim por diante -- basta para migrar a persistencia: Controllers e Views
- * dependem somente das interfaces de repositorio.</p>
+ * <p><strong>Este e o unico arquivo que sabe qual persistencia esta em uso.</strong>
+ * A troca entre memoria e PostgreSQL acontece aqui, em {@link #criar()}, guiada pela
+ * chave {@code repositorio.tipo}: Controllers e Views dependem somente das interfaces
+ * de repositorio e nao mudaram uma linha por causa do banco.</p>
  */
 public class ContextoAplicacao {
 
@@ -44,6 +52,41 @@ public class ContextoAplicacao {
     private final ClienteController clienteController;
     private final ReservaController reservaController;
     private final AutenticacaoController autenticacaoController;
+
+    /**
+     * Monta o contexto conforme a chave {@code repositorio.tipo}.
+     *
+     * <p>Com {@code jdbc}, aplica as migracoes e usa os repositorios JDBC da
+     * primeira fatia (usuario, pacote, cliente e reserva); as entidades da segunda
+     * fatia (pagamento, parcela, itinerario e recurso) seguem em memoria ate a
+     * Etapa 6. Com {@code memoria}, tudo fica em memoria e o PostgreSQL nem e
+     * procurado.</p>
+     */
+    public static ContextoAplicacao criar() {
+        if (ConfiguracaoAplicacao.tipoDeRepositorio() != ConfiguracaoAplicacao.TipoRepositorio.JDBC) {
+            return new ContextoAplicacao();
+        }
+        try {
+            Migracoes.aplicar(ConnectionFactory.getDataSource());
+        } catch (RuntimeException falha) {
+            throw new ConexaoIndisponivelException(
+                    "Nao foi possivel preparar o banco de dados: " + falha.getMessage(), falha);
+        }
+        return new ContextoAplicacao(
+                new JdbcPacoteRepository(),
+                new JdbcClienteRepository(),
+                new JdbcReservaRepository(),
+                new InMemoryPagamentoRepository(),
+                new InMemoryParcelaRepository(),
+                new InMemoryItinerarioRepository(),
+                new InMemoryRecursoRepository(),
+                new JdbcUsuarioRepository());
+    }
+
+    /** @return {@code true} quando os dados estao no PostgreSQL, nao em memoria. */
+    public boolean isPersistenciaEmBanco() {
+        return !(pacoteRepository instanceof com.tripcontrol.repository.memory.InMemoryPacoteRepository);
+    }
 
     /** Monta o contexto com as implementacoes em memoria (fase atual do projeto). */
     public ContextoAplicacao() {
@@ -82,7 +125,7 @@ public class ContextoAplicacao {
         this.pacoteController = new PacoteController(pacoteRepository, reservaRepository);
         this.clienteController = new ClienteController(clienteRepository, reservaRepository, pacoteRepository);
         this.reservaController = new ReservaController(reservaRepository, pacoteRepository,
-                clienteRepository, pacoteController);
+                clienteRepository, pagamentoRepository, pacoteController);
         this.autenticacaoController = new AutenticacaoController(usuarioRepository);
     }
 

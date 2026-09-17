@@ -8,7 +8,7 @@ disciplina de Engenharia de Software II (UNIVASF, 2026.2).
 | Linguagem | Java 21 |
 | Interface | JavaFX 21 (FXML + Controller separado) |
 | Build | Maven |
-| Persistência | PostgreSQL via JDBC puro — **ainda não ligada** (ver abaixo) |
+| Persistência | PostgreSQL via JDBC puro (HikariCP + Flyway) — 1ª fatia ligada |
 | Arquitetura | MVC com camada de repositório (padrão Repository/DAO) |
 
 ---
@@ -50,14 +50,14 @@ as telas já abram com conteúdo.
 | UC01 – Cadastrar Pacotes | completo, com FA01 a FA04 | completa |
 | UC02 – Cadastrar Clientes | completo, com FA01 a FA03 | completa |
 | UC03 – Registrar Reservas | completo, com FA01 a FA04 | completa |
-| UC04 – Controlar Vagas | cálculo de ocupação e alteração de capacidade (FA03, FA04) | próxima fase |
+| UC04 – Controlar Vagas | completo, com FA01, FA03, FA04 e FA05 | completa |
 | UC05 – Gerenciar Pagamentos | entidades e repositórios prontos | próxima fase |
 | UC06 – Montar Itinerário | entidades e repositórios prontos | próxima fase |
-| UC07 – Cancelar Reservas | entidades prontas (`Cancelamento`, `Reserva.cancelar`) | próxima fase |
+| UC07 – Cancelar Reservas | completo, com FA01 a FA06 | completa |
 | UC08 – Gerar Relatórios | consultas de apoio nos repositórios | próxima fase |
 
-As telas de UC04 a UC08 já aparecem no menu lateral e abrem um marcador
-"em construção", de modo que a navegação funciona de ponta a ponta.
+As telas de UC05, UC06 e UC08 ainda abrem um marcador "em construção", de modo
+que a navegação funciona de ponta a ponta.
 
 ---
 
@@ -98,28 +98,58 @@ src/test/java/com/tripcontrol/  # testes JUnit 5 das regras de negócio
 
 ---
 
-## Banco de dados: por que ainda não está ligado
+## Banco de dados
 
-O modelo de dados está sendo fechado pela equipe, então nenhuma classe abre
-conexão nesta fase. O que já existe:
+A primeira fatia já roda sobre PostgreSQL: **Usuário, Pacote, Cliente e Reserva**.
+Pagamento, Parcela, Itinerário e Recurso seguem em memória até a segunda fatia.
 
-- `util/DatabaseConfig` lê host, porta, banco, usuário e senha de
-  `resources/config/database.properties`, com sobrescrita por variável de
-  ambiente (`TRIPCONTROL_DB_HOST` e afins).
-- `util/ConnectionFactory` tem o método `abrirConexao()` com o corpo real
-  comentado e uma exceção explícita no lugar.
+### Escolher onde os dados ficam
 
-**Para ligar o banco, na próxima fase:**
+`src/main/resources/config/aplicacao.properties`:
 
-1. Criar `JdbcPacoteRepository`, `JdbcClienteRepository`, etc., implementando as
-   mesmas interfaces de `repository/`.
-2. Descomentar o corpo de `ConnectionFactory.abrirConexao()`.
-3. Trocar as implementações no construtor de `app/ContextoAplicacao`.
+```properties
+# memoria = nada é gravado, não exige PostgreSQL (plano B da apresentação)
+# jdbc    = persistência real, aplica as migrações no start
+repositorio.tipo=jdbc
+```
 
-Nenhum Controller e nenhuma View precisam ser alterados — essa era a razão de
-isolar a persistência desde agora.
+Também dá para sobrescrever pela variável de ambiente `TRIPCONTROL_REPOSITORIO`
+ou pela propriedade de sistema `-Drepositorio.tipo=...`.
 
----
+### Preparar o banco
+
+1. Criar um banco vazio: `createdb tripcontrol` (ou `CREATE DATABASE tripcontrol;`).
+2. Conferir host, porta, usuário e senha em `config/database.properties` — cada chave
+   aceita sobrescrita por variável de ambiente (`TRIPCONTROL_DB_HOST` e afins), para
+   nunca haver senha no repositório.
+3. Rodar a aplicação. O Flyway aplica as migrações sozinho:
+
+```
+src/main/resources/db/migration/
+├── V1__criar_schema_inicial.sql   # o script da equipe, sem alteração
+├── V2__ajustes_fatia_1.sql        # colunas e constraints que os casos de uso exigem
+└── R__carga_inicial.sql           # usuário inicial (ana.silva@tripcontrol.com / tripcontrol)
+```
+
+Uma migração já aplicada nunca é editada: correção entra como arquivo novo (`V3__...`).
+
+### Testes
+
+```bash
+mvn clean test     # unidade, sempre em memória, não exige banco
+mvn clean verify   # inclui os testes de integração (*IT) contra o banco de teste
+```
+
+Os testes de integração usam um banco separado e desfazem cada transação no fim.
+Sem banco disponível eles se auto-ignoram, então a build não quebra. Configuração por
+variável de ambiente: `TRIPCONTROL_TEST_DB_HOST`, `..._PORT`, `..._NAME`
+(padrão `tripcontrol_test`), `..._USER`, `..._PASSWORD`.
+
+### Como a troca de persistência foi isolada
+
+`app/ContextoAplicacao.criar()` é o único ponto que sabe qual implementação está em
+uso. Controllers e Views dependem só das interfaces de repositório e não mudaram por
+causa do banco — que era exatamente a aposta feita na primeira fase.
 
 ## Observação sobre o esqueleto antigo
 

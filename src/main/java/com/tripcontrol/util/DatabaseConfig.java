@@ -36,6 +36,11 @@ public final class DatabaseConfig {
         this.senha = senha;
     }
 
+    /** Cria uma configuracao explicita; usado pelos testes de integracao. */
+    public static DatabaseConfig de(String host, int porta, String nomeBanco, String usuario, String senha) {
+        return new DatabaseConfig(host, porta, nomeBanco, usuario, senha);
+    }
+
     /** Carrega o arquivo de propriedades aplicando as variaveis de ambiente por cima. */
     public static DatabaseConfig carregar() {
         Properties propriedades = new Properties();

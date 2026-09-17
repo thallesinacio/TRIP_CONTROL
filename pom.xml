@@ -15,6 +15,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <javafx.version>21.0.4</javafx.version>
+        <hikari.version>5.1.0</hikari.version>
+        <flyway.version>10.20.1</flyway.version>
         <junit.version>5.10.2</junit.version>
         <main.class>com.tripcontrol.Main</main.class>
     </properties>
@@ -39,16 +41,26 @@
             <version>0.4</version>
         </dependency>
 
-        <!--
-            Driver JDBC do PostgreSQL.
-            Declarado desde ja para a fase de persistencia real (RNF05),
-            porem NENHUMA classe do projeto abre conexao neste momento:
-            os repositorios em uso sao as implementacoes em memoria.
-        -->
+        <!-- Persistencia real (RNF05): driver, pool de conexoes e migracoes -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikari.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>${flyway.version}</version>
         </dependency>
 
         <!-- Testes -->
@@ -68,10 +80,35 @@
                 <version>3.13.0</version>
             </plugin>
 
+            <!-- Testes de unidade (*Test): rodam sempre, em memoria, sem exigir banco -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <repositorio.tipo>memoria</repositorio.tipo>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+
+            <!--
+                Testes de integracao (*IT): rodam em "mvn verify" contra o banco de
+                teste. Sem banco disponivel eles se auto-ignoram (Assumptions), entao
+                a build nao quebra na maquina de quem nao subiu o PostgreSQL.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- mvn javafx:run -->

@@ -7,6 +7,7 @@ import com.tripcontrol.model.Pacote;
 import com.tripcontrol.model.Reserva;
 import com.tripcontrol.repository.PacoteRepository;
 import com.tripcontrol.repository.ReservaRepository;
+import com.tripcontrol.util.Conexoes;
 import com.tripcontrol.util.Formatadores;
 
 import java.math.BigDecimal;
@@ -215,11 +216,14 @@ public class PacoteController {
                     "Valor minimo permitido: " + ocupadasAgora + " (vagas ja ocupadas).");
         }
 
-        AlteracaoCapacidade alteracao = new AlteracaoCapacidade(pacoteId, pacote.getCapacidadeTotal(),
-                novaCapacidade.get(), justificativa.trim(), usuarioResponsavel);
-        pacote.setCapacidadeTotal(novaCapacidade.get());
-        pacote.registrarAlteracaoCapacidade(alteracao);
-        pacoteRepository.atualizar(pacote);
+        // A nova capacidade e o registro da justificativa entram juntos (UC04, passo 7).
+        Conexoes.emTransacao(() -> {
+            AlteracaoCapacidade alteracao = new AlteracaoCapacidade(pacoteId, pacote.getCapacidadeTotal(),
+                    novaCapacidade.get(), justificativa.trim(), usuarioResponsavel);
+            pacote.setCapacidadeTotal(novaCapacidade.get());
+            pacote.registrarAlteracaoCapacidade(alteracao);
+            return pacoteRepository.atualizar(pacote);
+        });
 
         PacoteComVagas atualizado = comVagas(pacote);
         return Resultado.sucesso(atualizado,

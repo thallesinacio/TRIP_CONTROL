@@ -73,6 +73,11 @@ public class InMemoryPacoteRepository extends RepositorioEmMemoria<Pacote> imple
     }
 
     @Override
+    public void bloquearParaAtualizacao(Long pacoteId) {
+        // Sem efeito: o acesso ao mapa interno ja e sincronizado.
+    }
+
+    @Override
     public synchronized String proximoCodigo() {
         return String.format("PC-%03d", CODIGO_INICIAL + valorAtualDaSequencia() + 1);
     }

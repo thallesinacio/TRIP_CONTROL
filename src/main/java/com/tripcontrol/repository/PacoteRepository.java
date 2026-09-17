@@ -21,6 +21,16 @@ public interface PacoteRepository extends Repositorio<Pacote> {
     List<Pacote> buscarPorPeriodo(LocalDate inicio, LocalDate fim);
 
     /**
+     * Bloqueia a linha do pacote ate o fim da transacao corrente.
+     *
+     * <p>Chamado antes de contar vagas e gravar uma reserva (UC03): sem isso, duas
+     * instancias da aplicacao podem contar as mesmas vagas livres e ultrapassar a
+     * capacidade. Na implementacao em memoria nao faz nada, porque o repositorio
+     * ja e sincronizado.</p>
+     */
+    void bloquearParaAtualizacao(Long pacoteId);
+
+    /**
      * Gera o proximo codigo de negocio no formato {@code PC-000}.
      * Na implementacao JDBC correspondera a uma sequence do banco.
      */

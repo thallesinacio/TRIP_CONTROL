@@ -1,25 +1,44 @@
 package com.tripcontrol.util;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Ponto unico de abertura de conexoes JDBC com o PostgreSQL local (RNF05).
+ * Ponto unico de acesso ao PostgreSQL local (RNF05).
  *
- * <p><strong>Esqueleto: nao ha chamada a esta classe em nenhum ponto do sistema
- * nesta fase.</strong> O metodo {@link #abrirConexao()} esta propositalmente
- * comentado porque o modelo de dados ainda nao foi fechado pela equipe; ligar o
- * banco significara descomentar o corpo do metodo, criar os repositorios
- * {@code Jdbc*Repository} e trocar a montagem em {@code ContextoAplicacao}.</p>
+ * <p>Usa um pool de conexoes mesmo sendo uma aplicacao desktop: abrir conexao com
+ * o PostgreSQL custa dezenas a centenas de milissegundos, e cada acao de tela
+ * dispara pelo menos uma consulta. O pool tambem denuncia conexao esquecida
+ * aberta ({@code leakDetectionThreshold}), que e o erro mais comum ao escrever
+ * JDBC na mao.</p>
  */
 public final class ConnectionFactory {
 
+    /** Desktop local, poucas operacoes simultaneas: cinco conexoes sobram. */
+    private static final int TAMANHO_MAXIMO_DO_POOL = 5;
+    private static final long TEMPO_LIMITE_DE_CONEXAO_MS = 5_000L;
+    private static final long LIMITE_DE_VAZAMENTO_MS = 10_000L;
+
+    private static HikariDataSource dataSource;
     private static DatabaseConfig configuracao;
 
     private ConnectionFactory() {
     }
 
-    /** Carrega (uma unica vez) os parametros de conexao. */
+    /**
+     * Substitui a configuracao lida do arquivo. Usado pelos testes de integracao
+     * para apontar para o banco de teste sem mexer no {@code .properties}.
+     * Encerra o pool anterior, se houver.
+     */
+    public static synchronized void configurar(DatabaseConfig novaConfiguracao) {
+        encerrar();
+        configuracao = novaConfiguracao;
+    }
+
     public static synchronized DatabaseConfig getConfiguracao() {
         if (configuracao == null) {
             configuracao = DatabaseConfig.carregar();
@@ -27,22 +46,41 @@ public final class ConnectionFactory {
         return configuracao;
     }
 
+    /** @return pool de conexoes, criado na primeira chamada. */
+    public static synchronized DataSource getDataSource() {
+        if (dataSource == null) {
+            DatabaseConfig config = getConfiguracao();
+            HikariConfig hikari = new HikariConfig();
+            hikari.setJdbcUrl(config.getUrlJdbc());
+            hikari.setUsername(config.getUsuario());
+            hikari.setPassword(config.getSenha());
+            hikari.setMaximumPoolSize(TAMANHO_MAXIMO_DO_POOL);
+            hikari.setMinimumIdle(1);
+            hikari.setConnectionTimeout(TEMPO_LIMITE_DE_CONEXAO_MS);
+            hikari.setLeakDetectionThreshold(LIMITE_DE_VAZAMENTO_MS);
+            hikari.setPoolName("TripControlPool");
+            hikari.setAutoCommit(true);
+            dataSource = new HikariDataSource(hikari);
+        }
+        return dataSource;
+    }
+
     /**
-     * Abre uma conexao com o banco local.
+     * Abre uma conexao do pool.
      *
-     * @throws UnsupportedOperationException enquanto a persistencia real nao estiver habilitada
+     * <p>Repositorios nao devem chamar este metodo diretamente: usam
+     * {@link Conexoes#atual()}, que devolve a conexao da transacao corrente
+     * quando existe uma em andamento.</p>
      */
     public static Connection abrirConexao() throws SQLException {
-        throw new UnsupportedOperationException(
-                "Persistencia em banco ainda nao habilitada nesta fase do projeto. "
-                        + "Os dados estao nos repositorios em memoria.");
+        return getDataSource().getConnection();
+    }
 
-        /*
-         * Implementacao prevista para a proxima fase:
-         *
-         * DatabaseConfig config = getConfiguracao();
-         * return DriverManager.getConnection(
-         *         config.getUrlJdbc(), config.getUsuario(), config.getSenha());
-         */
+    /** Fecha o pool. Chamado no encerramento da aplicacao e entre testes. */
+    public static synchronized void encerrar() {
+        if (dataSource != null) {
+            dataSource.close();
+            dataSource = null;
+        }
     }
 }

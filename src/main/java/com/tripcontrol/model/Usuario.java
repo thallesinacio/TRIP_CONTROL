@@ -9,6 +9,8 @@ import java.util.Objects;
 public class Usuario {
 
     private Long id;
+    /** Chave primaria da tabela Funcionario; obrigatorio para gravar no banco. */
+    private String cpf;
     private String nome;
     private String email;
     private String senhaHash;
@@ -27,6 +29,14 @@ public class Usuario {
 
     public Long getId() {
         return id;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public void setId(Long id) {

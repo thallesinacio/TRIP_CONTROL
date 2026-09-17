@@ -351,3 +351,159 @@
     -fx-font-size: 24px;
     -fx-font-weight: bold;
 }
+
+/* ------------------- Tabelas (UC04 e UC07) ------------------ */
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: -cor-borda;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 10 10 0 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 38px;
+    -fx-border-color: transparent transparent -cor-borda transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: -cor-texto;
+    -fx-padding: 10 12 10 12;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -cor-menta;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: -cor-marca-escura;
+    -fx-font-weight: bold;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: -cor-texto-secundario;
+}
+
+/* ---------------------- Chips de situacao -------------------- */
+
+.chip-disponivel {
+    -fx-text-fill: #047857;
+    -fx-font-weight: bold;
+}
+
+.chip-lotado {
+    -fx-text-fill: #B91C1C;
+    -fx-font-weight: bold;
+}
+
+.chip-encerrado {
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+}
+
+.chip-situacao {
+    -fx-background-color: -cor-menta;
+    -fx-text-fill: -cor-marca-escura;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+    -fx-padding: 5 12 5 12;
+    -fx-background-radius: 20;
+}
+
+/* ------------------- Tela de vagas (UC04) ------------------- */
+
+.painel-vazio {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+}
+
+.codigo-pacote {
+    -fx-font-family: "Consolas", "DejaVu Sans Mono", monospace;
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-size: 11px;
+}
+
+.nota-calculo {
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-size: 11px;
+}
+
+/* --------------- Tela de cancelamentos (UC07) --------------- */
+
+.titulo-secao-perigo {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #DC2626;
+}
+
+.botao-perigo {
+    -fx-background-color: #EF4444;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 11 26 11 26;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.botao-perigo:hover {
+    -fx-background-color: #DC2626;
+}
+
+.rotulo-detalhe {
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-size: 12px;
+}
+
+.valor-detalhe {
+    -fx-text-fill: -cor-texto;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.painel-financeiro {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 12;
+}
+
+.rotulo-financeiro-positivo,
+.valor-financeiro-positivo {
+    -fx-text-fill: #047857;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.rotulo-financeiro-negativo,
+.valor-financeiro-negativo {
+    -fx-text-fill: #DC2626;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.aviso-bloqueio {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+    -fx-padding: 10 14 10 14;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+}
+
+.aviso-politicas {
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-size: 11px;
+}

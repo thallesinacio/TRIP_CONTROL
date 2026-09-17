@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tripcontrol.view.CancelamentoController"
+      spacing="20.0">
+
+    <!-- Pesquisa da reserva (UC07, passos 2 e 3) -->
+    <VBox styleClass="cartao" spacing="12.0">
+        <padding>
+            <Insets top="20.0" right="24.0" bottom="20.0" left="24.0"/>
+        </padding>
+
+        <GridPane hgap="16.0" vgap="6.0">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="22.0"/>
+                <ColumnConstraints percentWidth="22.0"/>
+                <ColumnConstraints percentWidth="26.0"/>
+                <ColumnConstraints percentWidth="18.0"/>
+                <ColumnConstraints percentWidth="12.0"/>
+            </columnConstraints>
+
+            <VBox spacing="6.0" GridPane.columnIndex="0">
+                <Label text="Código da Reserva" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtCodigoReserva" promptText="Ex: RE-8912"/>
+            </VBox>
+            <VBox spacing="6.0" GridPane.columnIndex="1">
+                <Label text="CPF do Cliente" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtCpfCliente" promptText="000.000.000-00"/>
+            </VBox>
+            <VBox spacing="6.0" GridPane.columnIndex="2">
+                <Label text="Nome do Cliente" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtNomeCliente" promptText="Mariana Silva"/>
+            </VBox>
+            <VBox spacing="6.0" GridPane.columnIndex="3">
+                <Label text="Código do Pacote" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtCodigoPacote" promptText="PC-105"/>
+            </VBox>
+            <VBox spacing="6.0" alignment="BOTTOM_RIGHT" GridPane.columnIndex="4">
+                <Button fx:id="btnConsultar" text="Consultar" onAction="#aoConsultar"
+                        maxWidth="Infinity" defaultButton="true" styleClass="botao-primario"/>
+            </VBox>
+        </GridPane>
+
+        <Label fx:id="lblMensagemPesquisa" styleClass="mensagem-erro" wrapText="true"
+               managed="false" visible="false"/>
+
+        <TableView fx:id="tableReservas" prefHeight="170.0">
+            <columns>
+                <TableColumn fx:id="colCodigo" text="Reserva" prefWidth="100.0"/>
+                <TableColumn fx:id="colCliente" text="Cliente" prefWidth="220.0"/>
+                <TableColumn fx:id="colPacote" text="Pacote" prefWidth="200.0"/>
+                <TableColumn fx:id="colPeriodo" text="Período" prefWidth="180.0"/>
+                <TableColumn fx:id="colViajantes" text="Viajantes" prefWidth="90.0"/>
+                <TableColumn fx:id="colSituacao" text="Situação" prefWidth="110.0"/>
+            </columns>
+        </TableView>
+    </VBox>
+
+    <GridPane hgap="24.0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="55.0"/>
+            <ColumnConstraints percentWidth="45.0"/>
+        </columnConstraints>
+
+        <!-- Detalhes da reserva selecionada (UC07, passo 4) -->
+        <VBox GridPane.columnIndex="0" styleClass="cartao" spacing="12.0">
+            <padding>
+                <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label text="Detalhes da Reserva Selecionada" styleClass="titulo-secao"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblSituacaoReserva" text="-" styleClass="chip-situacao"/>
+            </HBox>
+
+            <GridPane hgap="14.0" vgap="9.0" styleClass="grade-detalhes">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="42.0"/>
+                    <ColumnConstraints percentWidth="58.0"/>
+                </columnConstraints>
+
+                <Label text="Código da Reserva:" styleClass="rotulo-detalhe"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Label fx:id="lblCodigoReserva" text="-" styleClass="valor-detalhe"
+                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <Label text="Cliente Titular:" styleClass="rotulo-detalhe"
+                       GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Label fx:id="lblClienteTitular" text="-" wrapText="true" styleClass="valor-detalhe"
+                       GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                <Label text="CPF:" styleClass="rotulo-detalhe"
+                       GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Label fx:id="lblCpfCliente" text="-" styleClass="valor-detalhe"
+                       GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label text="Pacote de Viagem:" styleClass="rotulo-detalhe"
+                       GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Label fx:id="lblPacoteViagem" text="-" wrapText="true" styleClass="valor-detalhe"
+                       GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                <Label text="Período:" styleClass="rotulo-detalhe"
+                       GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <Label fx:id="lblPeriodo" text="-" styleClass="valor-detalhe"
+                       GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                <Label text="Quantidade de Viajantes:" styleClass="rotulo-detalhe"
+                       GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                <Label fx:id="lblQuantidadeViajantes" text="-" styleClass="valor-detalhe"
+                       GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+            </GridPane>
+
+            <VBox spacing="8.0" styleClass="painel-financeiro">
+                <padding>
+                    <Insets top="14.0" right="16.0" bottom="14.0" left="16.0"/>
+                </padding>
+                <HBox>
+                    <Label text="Total do Pacote:" styleClass="rotulo-detalhe"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblTotalPacote" text="-" styleClass="valor-detalhe"/>
+                </HBox>
+                <HBox>
+                    <Label text="Total Pago:" styleClass="rotulo-financeiro-positivo"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblTotalPago" text="-" styleClass="valor-financeiro-positivo"/>
+                </HBox>
+                <HBox>
+                    <Label text="Saldo Pendente:" styleClass="rotulo-financeiro-negativo"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblSaldoPendente" text="-" styleClass="valor-financeiro-negativo"/>
+                </HBox>
+            </VBox>
+
+            <Label fx:id="lblCancelamentoExistente" wrapText="true" styleClass="aviso-bloqueio"
+                   managed="false" visible="false"/>
+        </VBox>
+
+        <!-- Procedimento de cancelamento (UC07, passos 5 a 8) -->
+        <VBox fx:id="painelCancelamento" GridPane.columnIndex="1" styleClass="cartao" spacing="12.0">
+            <padding>
+                <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
+            </padding>
+
+            <Label text="Procedimento de Cancelamento" styleClass="titulo-secao-perigo"/>
+
+            <VBox spacing="6.0">
+                <Label text="Motivo do Cancelamento" styleClass="rotulo-campo"/>
+                <ComboBox fx:id="cboMotivo" maxWidth="Infinity" promptText="Selecione o motivo"/>
+                <Label fx:id="lblErroMotivo" styleClass="mensagem-erro" wrapText="true"
+                       managed="false" visible="false"/>
+            </VBox>
+
+            <VBox spacing="6.0">
+                <Label fx:id="lblRotuloDescricao" text="Descrição / Justificativa detalhada"
+                       styleClass="rotulo-campo"/>
+                <TextArea fx:id="txtDescricaoMotivo" prefRowCount="5" wrapText="true"
+                          promptText="Descreva o motivo informado pelo passageiro."/>
+                <Label fx:id="lblErroDescricao" styleClass="mensagem-erro" wrapText="true"
+                       managed="false" visible="false"/>
+            </VBox>
+
+            <Label fx:id="lblAvisoPoliticas" wrapText="true" styleClass="aviso-politicas"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button fx:id="btnConfirmarCancelamento" text="Confirmar Cancelamento"
+                    onAction="#aoConfirmarCancelamento" maxWidth="Infinity"
+                    styleClass="botao-perigo"/>
+            <Button fx:id="btnNaoCancelar" text="Não Cancelar / Voltar" onAction="#aoNaoCancelar"
+                    maxWidth="Infinity" styleClass="botao-secundario"/>
+        </VBox>
+    </GridPane>
+</VBox>

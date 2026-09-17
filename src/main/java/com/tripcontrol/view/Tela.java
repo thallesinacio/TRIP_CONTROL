@@ -10,28 +10,28 @@ public enum Tela {
             "Use suas credenciais para acessar o painel TripControl."),
 
     PACOTES("/fxml/pacote-form.fxml", "Cadastrar Novo Pacote de Viagem",
-            "Crie e publique novos roteiros no catalogo geral"),
+            "Crie e publique novos roteiros no catálogo geral"),
 
     CLIENTES("/fxml/cliente-form.fxml", "Cadastrar Cliente",
-            "Gerencie as fichas cadastrais e preferencias de viajantes"),
+            "Gerencie as fichas cadastrais e preferências de viajantes"),
 
     RESERVAS("/fxml/reserva-form.fxml", "Registrar Nova Reserva",
-            "Emita reservas de pacotes turisticos para clientes cadastrados"),
+            "Emita reservas de pacotes turísticos para clientes cadastrados"),
 
-    VAGAS("/fxml/em-construcao.fxml", "Controlar Ocupacao de Vagas",
+    VAGAS("/fxml/vagas-view.fxml", "Controlar Ocupação de Vagas",
             "Monitore e altere a capacidade operacional de cada pacote de viagem"),
 
     PAGAMENTOS("/fxml/em-construcao.fxml", "Gerenciamento Financeiro",
-            "Controle e de baixa em parcelas de pagamentos de clientes"),
+            "Controle e dê baixa em parcelas de pagamentos de clientes"),
 
-    ITINERARIOS("/fxml/em-construcao.fxml", "Montar Itinerario Detalhado",
+    ITINERARIOS("/fxml/em-construcao.fxml", "Montar Itinerário Detalhado",
             "Estruture o cronograma dia a dia para o pacote selecionado"),
 
-    CANCELAMENTOS("/fxml/em-construcao.fxml", "Gestao de Cancelamentos",
-            "Cancele e reembolse reservas ativas conforme politicas vigentes"),
+    CANCELAMENTOS("/fxml/cancelamento-view.fxml", "Gestão de Cancelamentos",
+            "Cancele reservas ativas conforme as políticas vigentes"),
 
-    RELATORIOS("/fxml/em-construcao.fxml", "Relatorios Operacionais e Financeiros",
-            "Gere listagens consolidadas e relatorios estatisticos para exportacao");
+    RELATORIOS("/fxml/em-construcao.fxml", "Relatórios Operacionais e Financeiros",
+            "Gere listagens consolidadas e relatórios estatísticos para exportação");
 
     private final String arquivoFxml;
     private final String titulo;

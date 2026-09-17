@@ -26,7 +26,10 @@ public class Reserva {
     private StatusReserva status = StatusReserva.ATIVA;
     private LocalDateTime dataRegistro = LocalDateTime.now();
     private Cancelamento cancelamento;
-    /** Contador usado para detectar alteracao concorrente (UC07 FA05, UC04 FA04). */
+    /**
+     * Versao da linha, incrementada a cada gravacao pelo repositorio e usada no
+     * bloqueio otimista (UC07 FA05, UC04 FA04).
+     */
     private long versao;
 
     public Reserva() {
@@ -50,11 +53,16 @@ public class Reserva {
         return status == StatusReserva.CANCELADA;
     }
 
-    /** Aplica o cancelamento mantendo o historico financeiro (UC07, passo 9). */
+    /**
+     * Aplica o cancelamento mantendo o historico financeiro (UC07, passo 9).
+     *
+     * <p>Nao mexe na versao: quem incrementa e o repositorio, ao gravar, para que
+     * o valor em memoria continue sendo a versao efetivamente persistida (base do
+     * bloqueio otimista).</p>
+     */
     public void cancelar(Cancelamento dadosCancelamento) {
         this.cancelamento = dadosCancelamento;
         this.status = StatusReserva.CANCELADA;
-        this.versao++;
     }
 
     public Long getId() {

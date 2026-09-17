@@ -8,6 +8,7 @@ import com.tripcontrol.model.Pacote;
 import com.tripcontrol.model.PerfilAcesso;
 import com.tripcontrol.util.Formatadores;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -48,6 +49,21 @@ public final class DadosDemonstracao {
                 "5200,00", "25",
                 "Dia 1: Chegada\nDia 2: City tour\nDia 3: Valle Nevado");
 
+        // Pacote pequeno que sera totalmente ocupado mais abaixo: serve para a
+        // situacao "Lotado" aparecer na tela de controle de vagas (UC04).
+        Pacote reveillon = criarPacote(contexto, "Reveillon Copacabana, RJ",
+                hoje.plusMonths(4), hoje.plusMonths(4).plusDays(4),
+                "Hotel na orla com vista para a queima de fogos.",
+                "2900,00", "6",
+                "Dia 1: Check-in\nDia 2: City tour\nDia 3: Reveillon na praia");
+
+        // Pacote ja encerrado, gravado direto no repositorio porque o UC01 (com razao)
+        // recusa cadastro com data de inicio no passado. E apenas massa de demonstracao:
+        // serve para a situacao "Encerrado" aparecer na tela de vagas.
+        criarPacoteEncerrado(contexto, "Machu Picchu, Peru",
+                hoje.minusMonths(2), hoje.minusMonths(2).plusDays(6),
+                "Trem panoramico e trilha guiada.", new BigDecimal("6100.00"), 22);
+
         Cliente carlos = criarCliente(contexto, "Carlos Eduardo de Souza", "529.982.247-25",
                 "(87) 99999-0000", "carlos.souza@email.com", List.of("Praia", "Ecoturismo"));
         Cliente mariana = criarCliente(contexto, "Mariana Silva de Oliveira", "111.444.777-35",
@@ -67,6 +83,29 @@ public final class DadosDemonstracao {
                     Formatadores.formatarData(noronha.getDataFim()),
                     null));
         }
+
+        // Ocupa todas as vagas do pacote de Reveillon (situacao "Lotado" no UC04).
+        if (reveillon != null && carlos != null) {
+            contexto.getReservaController().registrar(new DadosReserva(
+                    carlos.getId(), reveillon.getId(), "6",
+                    Formatadores.formatarData(reveillon.getDataInicio()),
+                    Formatadores.formatarData(reveillon.getDataFim()),
+                    "Grupo familiar."));
+        }
+    }
+
+    /**
+     * Grava um pacote com periodo ja encerrado diretamente pelo repositorio.
+     * Nao passa pelo {@code PacoteController} de proposito: o UC01 recusa datas
+     * de inicio no passado, e essa recusa deve continuar valendo no cadastro real.
+     */
+    private static void criarPacoteEncerrado(ContextoAplicacao contexto, String destino,
+                                             LocalDate inicio, LocalDate fim, String descricao,
+                                             BigDecimal preco, int capacidade) {
+        Pacote pacote = new Pacote(destino, inicio, fim, descricao, preco, capacidade,
+                "Roteiro concluido.");
+        pacote.setCodigo(contexto.getPacoteRepository().proximoCodigo());
+        contexto.getPacoteRepository().salvar(pacote);
     }
 
     private static Pacote criarPacote(ContextoAplicacao contexto, String destino, LocalDate inicio,

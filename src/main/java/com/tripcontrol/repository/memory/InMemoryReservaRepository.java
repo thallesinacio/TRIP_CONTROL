@@ -24,6 +24,14 @@ public class InMemoryReservaRepository extends RepositorioEmMemoria<Reserva> imp
         entidade.setId(id);
     }
 
+    /** Espelha o comportamento do repositorio JDBC: cada gravacao avanca a versao. */
+    @Override
+    public synchronized Reserva atualizar(Reserva entidade) {
+        Reserva atualizada = super.atualizar(entidade);
+        atualizada.setVersao(atualizada.getVersao() + 1);
+        return atualizada;
+    }
+
     @Override
     public synchronized Optional<Reserva> buscarPorCodigo(String codigo) {
         if (codigo == null) {
