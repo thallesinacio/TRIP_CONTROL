@@ -2,9 +2,9 @@
 
 create table Cliente (
     CPFCliente varchar(11) primary key,
-    nome varchar(120) not null,
-    contato varchar(120) not null,
-    preferencia text
+    nome varchar(120) not null
+    --contato varchar(120) not null,
+    --preferencia text
 );
 
 create table Funcionario (
@@ -30,7 +30,7 @@ create table Reserva (
     idReserva serial primary key,
     fkcodPacote int not null references Pacote(codPacote),
     fkCPFCliente varchar(11) not null references Cliente(CPFCliente),
-    fkCPFFuncionario varchar(11) references Funcionario(CPFFuncionario),
+    --fkCPFFuncionario varchar(11) references Funcionario(CPFFuncionario),
     quantidadeViajantes smallint not null check (quantidadeViajantes > 0),
     observacoes text,
     valorTotal decimal(10,2) not null check (valorTotal > 0),
@@ -89,7 +89,7 @@ create table Transporte (
 create table CapacidadeLog (
     idCapacidade serial primary key,
     fkcodPacote int not null references Pacote(codPacote),
-    fkCPFFuncionario varchar(11) references Funcionario(CPFFuncionario),
+    --fkCPFFuncionario varchar(11) references Funcionario(CPFFuncionario),
     dataInsercao timestamp not null default now(),
     quantidade smallint not null check (quantidade > 0),
     justificativa text

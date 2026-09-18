@@ -33,7 +33,7 @@ alter table Cliente add column telefone varchar(11);
 alter table Cliente add column email varchar(120);
 alter table Cliente add column endereco varchar(200);
 alter table Cliente add column dataCadastro timestamp not null default now();
-alter table Cliente alter column contato drop not null;
+--alter table Cliente alter column contato drop not null;
 
 -- UC02: preferencias sao varias por cliente (o UC08 ainda vai filtrar por elas).
 create table ClientePreferencia (
