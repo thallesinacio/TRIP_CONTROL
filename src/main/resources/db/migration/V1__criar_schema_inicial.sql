@@ -2,44 +2,74 @@
 
 create table Cliente (
     CPFCliente varchar(11) primary key,
-    nome varchar(120) not null
-    --contato varchar(120) not null,
-    --preferencia text
+    nome varchar(120) not null,
+    id serial,
+    telefone varchar(11),
+    email varchar(120),
+    endereco varchar(200),
+    dataCadastro timestamp not null default now(),
+    constraint uk_cliente_id unique (id)
+);
+
+create table ClientePreferencia (
+    fkCPFCliente varchar(11) not null references Cliente(CPFCliente) on delete cascade,
+    preferencia varchar(60) not null,
+    constraint pk_cliente_preferencia primary key (fkCPFCliente, preferencia)
 );
 
 create table Funcionario (
     CPFFuncionario varchar(11) primary key,
+    id serial,
     nome varchar(120) not null,
     email varchar(120) not null,
-    senha varchar not null
+    senha varchar not null,
+    perfil varchar(20) not null,
+    ativo boolean not null default true,
+    constraint uk_funcionario_id unique (id),
+    check (perfil in ('FUNCIONARIO', 'ADMINISTRADOR')),
+    constraint uk_funcionario_email unique (email)
 );
 
 create table Pacote (
     codPacote serial primary key,
+    codigo varchar(10),
     destino varchar(120) not null,
     dataInicio date not null,
     dataFim date not null,
-    descricao text not null,
-    roteiro text not null,
+    dataCadastro timestamp not null default now(),
+    descricao text,
+    roteiro text,
     capacidadeAtual smallint not null,
     preco decimal(10,2) not null check (preco > 0),
-    check (dataFim >= dataInicio)
+    constraint ck_pacote_periodo_estrito check (dataFim > dataInicio),
+    constraint uk_pacote_codigo unique (codigo),
+    constraint uk_pacote_destino_periodo unique (destino, dataInicio, dataFim),
+    constraint ck_pacote_capacidade check (capacidadeAtual > 0)
 );
 
 create table Reserva (
     idReserva serial primary key,
+    codigo varchar(10),
     fkcodPacote int not null references Pacote(codPacote),
     fkCPFCliente varchar(11) not null references Cliente(CPFCliente),
-    --fkCPFFuncionario varchar(11) references Funcionario(CPFFuncionario),
     quantidadeViajantes smallint not null check (quantidadeViajantes > 0),
     observacoes text,
+    dataInicio date,
+    dataFim date,
     valorTotal decimal(10,2) not null check (valorTotal > 0),
     dataCriacao timestamp not null,
+    versao bigint not null default 0,
     motivoCancelamento varchar,
     dataCancelamento timestamp,
+    descricaoCancelamento text,
+    responsavelCancelamento varchar(120),
+    vagasDevolvidas smallint,
+    constraint uk_reserva_codigo unique (codigo),
+    constraint ck_reserva_periodo check (dataInicio is null or dataFim is null or dataFim >= dataInicio),
     situacao varchar generated always as (
         case when motivoCancelamento is not null then 'Cancelada' else 'Ativa' end
     ) stored
+    
 );
 
 create table Parcela ( -- é preciso que o programa em java crie as parcelas de acordo com a quantidade de parcelas e definir o valor
@@ -89,11 +119,30 @@ create table Transporte (
 create table CapacidadeLog (
     idCapacidade serial primary key,
     fkcodPacote int not null references Pacote(codPacote),
-    --fkCPFFuncionario varchar(11) references Funcionario(CPFFuncionario),
+    capacidadeAnterior smallint,
+    responsavel varchar(120),
     dataInsercao timestamp not null default now(),
     quantidade smallint not null check (quantidade > 0),
     justificativa text
 );
+
+
+---------- SEQUENCES E INDICES ----------
+-- Geracao dos codigos de negocio (PacoteRepository.proximoCodigo e
+-- ReservaRepository.proximoCodigo). Buracos na numeracao sao esperados:
+-- uma sequence nao volta atras quando a transacao falha.
+create sequence seq_codigo_pacote start 101;
+create sequence seq_codigo_reserva start 8901;
+
+
+-- RNF03: o PostgreSQL nao cria indice para chave estrangeira automaticamente,
+-- e a contagem de vagas ocupadas roda em praticamente toda operacao.
+create index idx_reserva_pacote_situacao on Reserva (fkcodPacote, situacao);
+create index idx_reserva_cliente on Reserva (fkCPFCliente);
+create index idx_reserva_periodo on Reserva (dataInicio, dataFim);
+create index idx_capacidadelog_pacote on CapacidadeLog (fkcodPacote);
+
+
 
 ------- FUNÇÕES E VIEWS -------
 
