@@ -32,6 +32,7 @@ public class PrincipalController implements Initializable {
     @FXML private Label lblTituloTela;
     @FXML private Label lblSubtituloTela;
     @FXML private Label lblUsuarioLogado;
+    @FXML private Label lblStatusBanco;
     @FXML private StackPane areaConteudo;
 
     private final ContextoAplicacao contexto;
@@ -61,6 +62,22 @@ public class PrincipalController implements Initializable {
         });
 
         lblUsuarioLogado.setText(contexto.getAutenticacaoController().nomeDoUsuarioAutenticado());
+        exibirEstadoDaPersistencia();
+    }
+
+    /**
+     * Preenche o selo do menu lateral com o estado real da persistencia
+     * (conectado, sem conexao ou modo memoria), em vez de um texto fixo.
+     */
+    private void exibirEstadoDaPersistencia() {
+        ContextoAplicacao.EstadoDaPersistencia estado = contexto.estadoDaPersistencia();
+        lblStatusBanco.setText(estado.getDescricao());
+        lblStatusBanco.getStyleClass().removeAll("status-banco-alerta", "status-banco-memoria");
+        if (estado == ContextoAplicacao.EstadoDaPersistencia.SEM_CONEXAO) {
+            lblStatusBanco.getStyleClass().add("status-banco-alerta");
+        } else if (estado == ContextoAplicacao.EstadoDaPersistencia.MEMORIA) {
+            lblStatusBanco.getStyleClass().add("status-banco-memoria");
+        }
     }
 
     /** Coloca a tela no centro e atualiza cabecalho e item selecionado do menu. */

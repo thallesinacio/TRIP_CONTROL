@@ -104,8 +104,12 @@ src/test/java/com/tripcontrol/  # testes JUnit 5 das regras de negócio
 
 ## Banco de dados
 
-A primeira fatia já roda sobre PostgreSQL: **Usuário, Pacote, Cliente e Reserva**.
-Pagamento, Parcela, Itinerário e Recurso seguem em memória até a segunda fatia.
+**O sistema inteiro roda sobre PostgreSQL.** Usuário, Pacote, Cliente e Reserva
+entraram na primeira fatia (Etapa 3); Parcela, Pagamento, Recurso e Itinerário na
+segunda (Etapa 6). O modo memória continua disponível como plano B — veja abaixo.
+
+As decisões de modelagem e integração estão explicadas em
+[`docs/decisoes-banco.md`](docs/decisoes-banco.md).
 
 ### Escolher onde os dados ficam
 

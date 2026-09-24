@@ -23,17 +23,19 @@ public final class ConfiguracaoAplicacao {
         MEMORIA, JDBC;
 
         static TipoRepositorio doTexto(String texto) {
+            // JDBC e o padrao desde a Etapa 6: o sistema inteiro roda sobre o
+            // PostgreSQL, e o modo memoria passa a ser a excecao explicita.
             if (texto == null || texto.isBlank()) {
-                return MEMORIA;
+                return JDBC;
             }
-            return "jdbc".equalsIgnoreCase(texto.trim()) ? JDBC : MEMORIA;
+            return "memoria".equalsIgnoreCase(texto.trim()) ? MEMORIA : JDBC;
         }
     }
 
     private ConfiguracaoAplicacao() {
     }
 
-    /** @return tipo configurado; MEMORIA quando nada foi informado. */
+    /** @return tipo configurado; JDBC quando nada foi informado. */
     public static TipoRepositorio tipoDeRepositorio() {
         String doAmbiente = System.getenv(VARIAVEL_AMBIENTE);
         if (doAmbiente != null && !doAmbiente.isBlank()) {

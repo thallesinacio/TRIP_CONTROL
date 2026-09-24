@@ -39,7 +39,7 @@
             <ToggleButton fx:id="btnMenuRelatorios" text="Relatorios" maxWidth="Infinity" styleClass="item-menu"/>
 
             <Region VBox.vgrow="ALWAYS"/>
-            <Label text="Dados em memoria (banco pendente)" styleClass="status-banco" wrapText="true"/>
+            <Label fx:id="lblStatusBanco" text="Verificando persistência..." styleClass="status-banco" wrapText="true"/>
             <Label text="v0.1.0 - JDK 21" styleClass="status-versao"/>
         </VBox>
     </left>

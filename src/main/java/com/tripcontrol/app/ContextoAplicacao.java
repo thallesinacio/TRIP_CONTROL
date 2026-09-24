@@ -24,13 +24,20 @@ import com.tripcontrol.repository.memory.InMemoryRecursoRepository;
 import com.tripcontrol.repository.memory.InMemoryReservaRepository;
 import com.tripcontrol.repository.memory.InMemoryUsuarioRepository;
 import com.tripcontrol.repository.jdbc.JdbcClienteRepository;
+import com.tripcontrol.repository.jdbc.JdbcItinerarioRepository;
 import com.tripcontrol.repository.jdbc.JdbcPacoteRepository;
+import com.tripcontrol.repository.jdbc.JdbcPagamentoRepository;
+import com.tripcontrol.repository.jdbc.JdbcParcelaRepository;
+import com.tripcontrol.repository.jdbc.JdbcRecursoRepository;
 import com.tripcontrol.repository.jdbc.JdbcReservaRepository;
 import com.tripcontrol.repository.jdbc.JdbcUsuarioRepository;
 import com.tripcontrol.util.ConexaoIndisponivelException;
 import com.tripcontrol.util.ConfiguracaoAplicacao;
 import com.tripcontrol.util.ConnectionFactory;
 import com.tripcontrol.util.Migracoes;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Ponto unico de montagem das dependencias da aplicacao (injecao manual).
@@ -62,11 +69,10 @@ public class ContextoAplicacao {
     /**
      * Monta o contexto conforme a chave {@code repositorio.tipo}.
      *
-     * <p>Com {@code jdbc}, aplica as migracoes e usa os repositorios JDBC da
-     * primeira fatia (usuario, pacote, cliente e reserva); as entidades da segunda
-     * fatia (pagamento, parcela, itinerario e recurso) seguem em memoria ate a
-     * Etapa 6. Com {@code memoria}, tudo fica em memoria e o PostgreSQL nem e
-     * procurado.</p>
+     * <p>Com {@code jdbc} — o padrao —, aplica as migracoes e usa os repositorios
+     * JDBC de <strong>todas</strong> as entidades. Com {@code memoria}, tudo fica em
+     * memoria e o PostgreSQL nem e procurado: e o plano B da apresentacao e o que
+     * permite a suite de testes rodar sem banco instalado.</p>
      */
     public static ContextoAplicacao criar() {
         if (ConfiguracaoAplicacao.tipoDeRepositorio() != ConfiguracaoAplicacao.TipoRepositorio.JDBC) {
@@ -82,16 +88,53 @@ public class ContextoAplicacao {
                 new JdbcPacoteRepository(),
                 new JdbcClienteRepository(),
                 new JdbcReservaRepository(),
-                new InMemoryPagamentoRepository(),
-                new InMemoryParcelaRepository(),
-                new InMemoryItinerarioRepository(),
-                new InMemoryRecursoRepository(),
+                new JdbcPagamentoRepository(),
+                new JdbcParcelaRepository(),
+                new JdbcItinerarioRepository(),
+                new JdbcRecursoRepository(),
                 new JdbcUsuarioRepository());
     }
 
     /** @return {@code true} quando os dados estao no PostgreSQL, nao em memoria. */
     public boolean isPersistenciaEmBanco() {
         return !(pacoteRepository instanceof com.tripcontrol.repository.memory.InMemoryPacoteRepository);
+    }
+
+    /** Estado exibido no selo do menu lateral. */
+    public enum EstadoDaPersistencia {
+        CONECTADO("Conectado ao Banco"),
+        SEM_CONEXAO("Sem conexão com o banco"),
+        MEMORIA("Modo memória (plano B)");
+
+        private final String descricao;
+
+        EstadoDaPersistencia(String descricao) {
+            this.descricao = descricao;
+        }
+
+        public String getDescricao() {
+            return descricao;
+        }
+    }
+
+    /**
+     * Confere de verdade se o banco responde, em vez de apenas olhar a configuracao.
+     *
+     * <p>O selo do prototipo diz "Conectado ao Banco"; para isso ser uma informacao
+     * e nao um enfeite, ele precisa distinguir tres situacoes: rodando sobre o
+     * PostgreSQL, rodando em memoria por escolha, e configurado para o banco mas sem
+     * conseguir falar com ele (o servico caiu depois que a aplicacao abriu).</p>
+     */
+    public EstadoDaPersistencia estadoDaPersistencia() {
+        if (!isPersistenciaEmBanco()) {
+            return EstadoDaPersistencia.MEMORIA;
+        }
+        try (Connection conexao = ConnectionFactory.abrirConexao()) {
+            return conexao.isValid(2)
+                    ? EstadoDaPersistencia.CONECTADO : EstadoDaPersistencia.SEM_CONEXAO;
+        } catch (SQLException | RuntimeException falha) {
+            return EstadoDaPersistencia.SEM_CONEXAO;
+        }
     }
 
     /** Monta o contexto com as implementacoes em memoria (fase atual do projeto). */

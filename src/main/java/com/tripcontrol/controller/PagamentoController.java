@@ -14,6 +14,7 @@ import com.tripcontrol.model.Parcela;
 import com.tripcontrol.model.Reserva;
 import com.tripcontrol.model.StatusParcela;
 import com.tripcontrol.repository.ClienteRepository;
+import com.tripcontrol.repository.ConflitoDeConcorrenciaException;
 import com.tripcontrol.repository.PacoteRepository;
 import com.tripcontrol.repository.PagamentoRepository;
 import com.tripcontrol.repository.ParcelaRepository;
@@ -305,6 +306,14 @@ public class PagamentoController {
                 parcela.quitar(dataRecebimento, pagamento.getId());
                 return parcelaRepository.atualizar(parcela);
             });
+        } catch (ConflitoDeConcorrenciaException conflito) {
+            // FA05 detectado pelo proprio banco: o UPDATE exige que a parcela ainda
+            // esteja em aberto, entao outra instancia quitou esta parcela entre a
+            // leitura da tela e a gravacao.
+            desfazerBaixaEmMemoria(parcela, statusAnterior);
+            return Resultado.conflitoConcorrencia(null,
+                    "Esta parcela foi quitada por outro processo enquanto a tela estava aberta. "
+                            + "Os valores foram recarregados: revise o saldo antes de confirmar.");
         } catch (RuntimeException falha) {
             desfazerBaixaEmMemoria(parcela, statusAnterior);
             return Resultado.operacaoBloqueada("Nao foi possivel registrar o recebimento da reserva "
