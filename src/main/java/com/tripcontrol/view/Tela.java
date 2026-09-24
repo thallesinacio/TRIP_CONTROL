@@ -30,7 +30,7 @@ public enum Tela {
     CANCELAMENTOS("/fxml/cancelamento-view.fxml", "Gestão de Cancelamentos",
             "Cancele reservas ativas conforme as políticas vigentes"),
 
-    RELATORIOS("/fxml/em-construcao.fxml", "Relatórios Operacionais e Financeiros",
+    RELATORIOS("/fxml/relatorio-view.fxml", "Relatórios Operacionais e Financeiros",
             "Gere listagens consolidadas e relatórios estatísticos para exportação");
 
     private final String arquivoFxml;

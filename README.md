@@ -43,7 +43,7 @@ as telas já abram com conteúdo.
 
 ---
 
-## Estado atual (primeira fase)
+## Estado atual
 
 | Caso de uso | Regras (Controller) | Tela |
 |-------------|--------------------|------|
@@ -54,10 +54,9 @@ as telas já abram com conteúdo.
 | UC05 – Gerenciar Pagamentos | completo, com FA01 a FA06 | completa |
 | UC06 – Montar Itinerário | completo, com FA01 a FA07 | completa |
 | UC07 – Cancelar Reservas | completo, com FA01 a FA06 | completa |
-| UC08 – Gerar Relatórios | consultas de apoio nos repositórios | próxima fase |
+| UC08 – Gerar Relatórios | completo, com FA01 a FA06 | completa |
 
-Só a tela do UC08 ainda abre o marcador "em construção", de modo que a navegação
-funciona de ponta a ponta.
+Os oito casos de uso estão implementados ponta a ponta e rodam sobre o PostgreSQL.
 
 O cadastro de hospedagens, transportes e atividades que o UC06 pressupõe é um
 diálogo modal aberto pela tela de Itinerários, e não um item do menu lateral: o

@@ -6,6 +6,7 @@ import com.tripcontrol.controller.ClienteController;
 import com.tripcontrol.controller.ItinerarioController;
 import com.tripcontrol.controller.PacoteController;
 import com.tripcontrol.controller.PagamentoController;
+import com.tripcontrol.controller.RelatorioController;
 import com.tripcontrol.controller.ReservaController;
 import com.tripcontrol.repository.ClienteRepository;
 import com.tripcontrol.repository.ItinerarioRepository;
@@ -31,6 +32,9 @@ import com.tripcontrol.repository.jdbc.JdbcParcelaRepository;
 import com.tripcontrol.repository.jdbc.JdbcRecursoRepository;
 import com.tripcontrol.repository.jdbc.JdbcReservaRepository;
 import com.tripcontrol.repository.jdbc.JdbcUsuarioRepository;
+import com.tripcontrol.repository.relatorio.JdbcRelatorioRepository;
+import com.tripcontrol.repository.relatorio.RelatorioIndisponivel;
+import com.tripcontrol.repository.relatorio.RelatorioRepository;
 import com.tripcontrol.util.ConexaoIndisponivelException;
 import com.tripcontrol.util.ConfiguracaoAplicacao;
 import com.tripcontrol.util.ConnectionFactory;
@@ -57,6 +61,7 @@ public class ContextoAplicacao {
     private final ItinerarioRepository itinerarioRepository;
     private final RecursoRepository recursoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final RelatorioRepository relatorioRepository;
 
     private final CalculadoraFinanceira calculadoraFinanceira;
     private final PacoteController pacoteController;
@@ -64,6 +69,7 @@ public class ContextoAplicacao {
     private final ReservaController reservaController;
     private final PagamentoController pagamentoController;
     private final ItinerarioController itinerarioController;
+    private final RelatorioController relatorioController;
     private final AutenticacaoController autenticacaoController;
 
     /**
@@ -97,7 +103,12 @@ public class ContextoAplicacao {
 
     /** @return {@code true} quando os dados estao no PostgreSQL, nao em memoria. */
     public boolean isPersistenciaEmBanco() {
-        return !(pacoteRepository instanceof com.tripcontrol.repository.memory.InMemoryPacoteRepository);
+        return !emMemoria(pacoteRepository);
+    }
+
+    /** Estatico de proposito: o construtor precisa decidir isto antes de terminar. */
+    private static boolean emMemoria(PacoteRepository repositorio) {
+        return repositorio instanceof com.tripcontrol.repository.memory.InMemoryPacoteRepository;
     }
 
     /** Estado exibido no selo do menu lateral. */
@@ -181,6 +192,12 @@ public class ContextoAplicacao {
                 calculadoraFinanceira);
         this.itinerarioController = new ItinerarioController(itinerarioRepository,
                 recursoRepository, pacoteRepository, pacoteController);
+
+        // O UC08 exige banco disponivel. Em memoria, a implementacao "indisponivel"
+        // faz a tela explicar isso em vez de duplicar as cinco consultas agregadas.
+        this.relatorioRepository = emMemoria(pacoteRepository)
+                ? new RelatorioIndisponivel() : new JdbcRelatorioRepository();
+        this.relatorioController = new RelatorioController(relatorioRepository);
         this.autenticacaoController = new AutenticacaoController(usuarioRepository);
     }
 
@@ -202,6 +219,14 @@ public class ContextoAplicacao {
 
     public ItinerarioController getItinerarioController() {
         return itinerarioController;
+    }
+
+    public RelatorioController getRelatorioController() {
+        return relatorioController;
+    }
+
+    public RelatorioRepository getRelatorioRepository() {
+        return relatorioRepository;
     }
 
     public CalculadoraFinanceira getCalculadoraFinanceira() {

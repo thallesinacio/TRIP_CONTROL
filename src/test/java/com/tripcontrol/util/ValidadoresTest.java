@@ -75,4 +75,35 @@ class ValidadoresTest {
         assertTrue(SenhaUtils.conferir("tripcontrol", hash));
         assertFalse(SenhaUtils.conferir("outra", hash));
     }
+
+    @Test
+    @DisplayName("formatarMoeda e lerValorMonetario fecham o ciclo, inclusive com o espaco do pt-BR")
+    void valorMonetarioFazIdaEVolta() {
+        java.math.BigDecimal valor = new java.math.BigDecimal("1500.00");
+        String formatado = Formatadores.formatarMoeda(valor);
+
+        // NumberFormat em pt-BR usa espaco inquebravel depois do "R$"; se lerValor
+        // nao o tratar, somar valores vindos da tela devolve zero silenciosamente.
+        assertEquals(0, valor.compareTo(Formatadores.lerValorMonetario(formatado).orElseThrow()));
+        assertEquals(0, new java.math.BigDecimal("3490.00").compareTo(
+                Formatadores.lerValorMonetario("R$\u00a03.490,00").orElseThrow()));
+    }
+
+    @Test
+    @DisplayName("Percentual sai no padrao brasileiro, com virgula")
+    void formatacaoDePercentual() {
+        assertEquals("35,7%", Formatadores.formatarPercentual(new java.math.BigDecimal("35.74")));
+        assertEquals("100,0%", Formatadores.formatarPercentual(new java.math.BigDecimal("100")));
+        assertEquals("-", Formatadores.formatarPercentual(null));
+    }
+
+    @Test
+    @DisplayName("Horas do itinerario aceitam as formas digitadas na tela")
+    void leituraDeHoras() {
+        assertEquals(java.time.LocalTime.of(8, 30), Formatadores.lerHora("08:30").orElseThrow());
+        assertEquals(java.time.LocalTime.of(8, 30), Formatadores.lerHora("8:30").orElseThrow());
+        assertEquals(java.time.LocalTime.of(14, 0), Formatadores.lerHora("14").orElseThrow());
+        assertTrue(Formatadores.lerHora("25:00").isEmpty());
+        assertTrue(Formatadores.lerHora("abc").isEmpty());
+    }
 }

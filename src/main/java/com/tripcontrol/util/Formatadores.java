@@ -70,7 +70,9 @@ public final class Formatadores {
         if (texto == null || texto.isBlank()) {
             return Optional.empty();
         }
-        String limpo = texto.replace("R$", "").replace(" ", "").trim();
+        // O \u00A0 (espaco inquebravel) e o que NumberFormat em pt-BR coloca depois do
+        // "R$". Sem tira-lo, formatarMoeda e lerValorMonetario nao fecham o ciclo.
+        String limpo = texto.replace("R$", "").replaceAll("[\\s\\u00A0]", "").trim();
         if (limpo.contains(",")) {
             limpo = limpo.replace(".", "").replace(",", ".");
         }
@@ -146,6 +148,14 @@ public final class Formatadores {
             return Optional.empty();
         }
         return Optional.of(LocalDateTime.of(dia.get(), instante.get()));
+    }
+
+    /** Percentual no padrao brasileiro, com uma casa decimal: "73,3%". */
+    public static String formatarPercentual(BigDecimal valor) {
+        if (valor == null) {
+            return "-";
+        }
+        return valor.setScale(1, RoundingMode.HALF_UP).toPlainString().replace('.', ',') + "%";
     }
 
     /** "05/05/2026 08:30h", formato usado nos cartoes do cronograma (UC06). */

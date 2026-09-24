@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tripcontrol.view.RelatorioViewController"
+      spacing="20.0">
+
+    <!-- Modo memoria: a pre-condicao do UC08 exige banco disponivel -->
+    <Label fx:id="lblRelatoriosIndisponiveis" wrapText="true" styleClass="aviso-bloqueio"
+           managed="false" visible="false"/>
+
+    <GridPane fx:id="painelSelecao" hgap="24.0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="34.0"/>
+            <ColumnConstraints percentWidth="66.0"/>
+        </columnConstraints>
+
+        <!-- Tipos de relatorio (UC08, passos 2 e 3) -->
+        <VBox GridPane.columnIndex="0" styleClass="cartao" spacing="12.0">
+            <padding>
+                <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
+            </padding>
+            <Label text="Selecione o Tipo de Relatório" styleClass="titulo-secao"/>
+            <VBox spacing="10.0">
+                <RadioButton fx:id="rbReservas" text="Reservas"/>
+                <RadioButton fx:id="rbPagamentos" text="Pagamentos"/>
+                <RadioButton fx:id="rbPacotesMaisProcurados" text="Pacotes Mais Procurados"/>
+                <RadioButton fx:id="rbClientes" text="Clientes"/>
+                <RadioButton fx:id="rbOcupacao" text="Ocupação dos Pacotes"/>
+            </VBox>
+            <Label fx:id="lblErroTipo" styleClass="mensagem-erro" wrapText="true"
+                   managed="false" visible="false"/>
+        </VBox>
+
+        <!-- Filtros dinamicos (UC08, passos 4 e 5) -->
+        <VBox GridPane.columnIndex="1" styleClass="cartao" spacing="12.0">
+            <padding>
+                <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
+            </padding>
+            <Label fx:id="lblTituloFiltros" text="Filtros Dinâmicos" styleClass="titulo-secao"/>
+
+            <FlowPane fx:id="painelFiltros" hgap="16.0" vgap="12.0" prefWrapLength="640.0">
+                <VBox fx:id="grupoDataInicio" spacing="6.0" prefWidth="190.0">
+                    <Label fx:id="lblRotuloDataInicio" text="Período (Início)" styleClass="rotulo-campo"/>
+                    <DatePicker fx:id="dpDataInicio" maxWidth="Infinity"/>
+                    <Label fx:id="lblErroDataInicio" styleClass="mensagem-erro" wrapText="true"
+                           managed="false" visible="false"/>
+                </VBox>
+                <VBox fx:id="grupoDataFim" spacing="6.0" prefWidth="190.0">
+                    <Label fx:id="lblRotuloDataFim" text="Período (Fim)" styleClass="rotulo-campo"/>
+                    <DatePicker fx:id="dpDataFim" maxWidth="Infinity"/>
+                    <Label fx:id="lblErroDataFim" styleClass="mensagem-erro" wrapText="true"
+                           managed="false" visible="false"/>
+                </VBox>
+                <VBox fx:id="grupoSituacaoReserva" spacing="6.0" prefWidth="190.0">
+                    <Label text="Situação da Reserva" styleClass="rotulo-campo"/>
+                    <ComboBox fx:id="cboSituacaoReserva" maxWidth="Infinity" promptText="Todas"/>
+                </VBox>
+                <VBox fx:id="grupoCodigoPacote" spacing="6.0" prefWidth="190.0">
+                    <Label text="Código do Pacote" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtCodigoPacote" promptText="PC-000"/>
+                </VBox>
+                <VBox fx:id="grupoCpfCliente" spacing="6.0" prefWidth="190.0">
+                    <Label text="CPF do Cliente" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtCpfCliente" promptText="000.000.000-00"/>
+                </VBox>
+                <VBox fx:id="grupoSituacaoFinanceira" spacing="6.0" prefWidth="190.0">
+                    <Label text="Situação Financeira" styleClass="rotulo-campo"/>
+                    <ComboBox fx:id="cboSituacaoFinanceira" maxWidth="Infinity" promptText="Todas"/>
+                </VBox>
+                <VBox fx:id="grupoFormaPagamento" spacing="6.0" prefWidth="190.0">
+                    <Label text="Forma de Pagamento" styleClass="rotulo-campo"/>
+                    <ComboBox fx:id="cboFormaPagamento" maxWidth="Infinity" promptText="Todas"/>
+                </VBox>
+                <VBox fx:id="grupoPosicoesRanking" spacing="6.0" prefWidth="190.0">
+                    <Label text="Posições do Ranking" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtPosicoesRanking" promptText="Ex: 5"/>
+                    <Label fx:id="lblErroPosicoesRanking" styleClass="mensagem-erro" wrapText="true"
+                           managed="false" visible="false"/>
+                </VBox>
+                <VBox fx:id="grupoCriterioRanking" spacing="6.0" prefWidth="190.0">
+                    <Label text="Critério" styleClass="rotulo-campo"/>
+                    <ComboBox fx:id="cboCriterioRanking" maxWidth="Infinity" promptText="Selecione"/>
+                    <Label fx:id="lblErroCriterioRanking" styleClass="mensagem-erro" wrapText="true"
+                           managed="false" visible="false"/>
+                </VBox>
+                <VBox fx:id="grupoNomeCliente" spacing="6.0" prefWidth="190.0">
+                    <Label text="Nome do Cliente" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtNomeCliente" promptText="Parte do nome"/>
+                </VBox>
+                <VBox fx:id="grupoPreferencia" spacing="6.0" prefWidth="190.0">
+                    <Label text="Preferência de Viagem" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtPreferencia" promptText="Ex: Praia"/>
+                </VBox>
+                <VBox fx:id="grupoMinimoViagens" spacing="6.0" prefWidth="190.0">
+                    <Label text="Mín. de Viagens Concluídas" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtMinimoViagens" promptText="Ex: 1"/>
+                    <Label fx:id="lblErroMinimoViagens" styleClass="mensagem-erro" wrapText="true"
+                           managed="false" visible="false"/>
+                </VBox>
+                <VBox fx:id="grupoDestino" spacing="6.0" prefWidth="190.0">
+                    <Label text="Destino" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtDestino" promptText="Parte do destino"/>
+                </VBox>
+                <VBox fx:id="grupoSituacaoPacote" spacing="6.0" prefWidth="190.0">
+                    <Label text="Situação do Pacote" styleClass="rotulo-campo"/>
+                    <ComboBox fx:id="cboSituacaoPacote" maxWidth="Infinity" promptText="Todas"/>
+                </VBox>
+                <VBox fx:id="grupoPercentualMinimo" spacing="6.0" prefWidth="190.0">
+                    <Label text="Ocupação Mínima (%)" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtPercentualMinimo" promptText="0 a 100"/>
+                    <Label fx:id="lblErroPercentualMinimo" styleClass="mensagem-erro" wrapText="true"
+                           managed="false" visible="false"/>
+                </VBox>
+            </FlowPane>
+
+            <Label fx:id="lblMensagemGeracao" styleClass="mensagem-erro" wrapText="true"
+                   managed="false" visible="false"/>
+
+            <HBox spacing="12.0" alignment="CENTER_RIGHT">
+                <!-- FA06: nao aparece no prototipo, mas o fluxo alternativo exige -->
+                <Button fx:id="btnCancelar" text="Cancelar" onAction="#aoCancelar"
+                        styleClass="botao-secundario"/>
+                <Button fx:id="btnGerarRelatorio" text="Gerar Relatório" onAction="#aoGerarRelatorio"
+                        defaultButton="true" styleClass="botao-primario"/>
+            </HBox>
+        </VBox>
+    </GridPane>
+
+    <!-- Previa do relatorio (UC08, passo 8) -->
+    <VBox fx:id="painelPrevia" styleClass="cartao" spacing="14.0" managed="false" visible="false">
+        <padding>
+            <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
+        </padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <Label text="Pré-visualização do Relatório Gerado" styleClass="titulo-secao"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <HBox fx:id="painelTotais" spacing="8.0" alignment="CENTER_RIGHT"/>
+        </HBox>
+
+        <Label fx:id="lblResumoGeracao" text="-" styleClass="texto-secundario"/>
+        <Label fx:id="lblFiltrosAplicados" text="-" wrapText="true" styleClass="nota-calculo"/>
+
+        <TableView fx:id="tableRelatorio" prefHeight="300.0"/>
+
+        <HBox spacing="12.0" alignment="CENTER_RIGHT">
+            <Button fx:id="btnImprimir" text="Imprimir" onAction="#aoImprimir"
+                    styleClass="botao-secundario"/>
+            <MenuButton fx:id="btnExportar" text="Exportar" styleClass="botao-primario">
+                <items>
+                    <MenuItem text="Exportar como PDF" onAction="#aoExportarPdf"/>
+                    <MenuItem text="Exportar como CSV" onAction="#aoExportarCsv"/>
+                </items>
+            </MenuButton>
+        </HBox>
+    </VBox>
+</VBox>
