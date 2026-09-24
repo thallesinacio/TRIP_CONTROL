@@ -21,10 +21,10 @@ public enum Tela {
     VAGAS("/fxml/vagas-view.fxml", "Controlar Ocupação de Vagas",
             "Monitore e altere a capacidade operacional de cada pacote de viagem"),
 
-    PAGAMENTOS("/fxml/em-construcao.fxml", "Gerenciamento Financeiro",
+    PAGAMENTOS("/fxml/pagamento-view.fxml", "Gerenciamento Financeiro",
             "Controle e dê baixa em parcelas de pagamentos de clientes"),
 
-    ITINERARIOS("/fxml/em-construcao.fxml", "Montar Itinerário Detalhado",
+    ITINERARIOS("/fxml/itinerario-view.fxml", "Montar Itinerário Detalhado",
             "Estruture o cronograma dia a dia para o pacote selecionado"),
 
     CANCELAMENTOS("/fxml/cancelamento-view.fxml", "Gestão de Cancelamentos",

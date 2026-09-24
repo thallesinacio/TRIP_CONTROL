@@ -51,13 +51,17 @@ as telas já abram com conteúdo.
 | UC02 – Cadastrar Clientes | completo, com FA01 a FA03 | completa |
 | UC03 – Registrar Reservas | completo, com FA01 a FA04 | completa |
 | UC04 – Controlar Vagas | completo, com FA01, FA03, FA04 e FA05 | completa |
-| UC05 – Gerenciar Pagamentos | entidades e repositórios prontos | próxima fase |
-| UC06 – Montar Itinerário | entidades e repositórios prontos | próxima fase |
+| UC05 – Gerenciar Pagamentos | completo, com FA01 a FA06 | completa |
+| UC06 – Montar Itinerário | completo, com FA01 a FA07 | completa |
 | UC07 – Cancelar Reservas | completo, com FA01 a FA06 | completa |
 | UC08 – Gerar Relatórios | consultas de apoio nos repositórios | próxima fase |
 
-As telas de UC05, UC06 e UC08 ainda abrem um marcador "em construção", de modo
-que a navegação funciona de ponta a ponta.
+Só a tela do UC08 ainda abre o marcador "em construção", de modo que a navegação
+funciona de ponta a ponta.
+
+O cadastro de hospedagens, transportes e atividades que o UC06 pressupõe é um
+diálogo modal aberto pela tela de Itinerários, e não um item do menu lateral: o
+menu segue o protótipo.
 
 ---
 

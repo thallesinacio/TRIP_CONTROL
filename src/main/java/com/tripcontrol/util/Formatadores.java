@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
@@ -95,5 +96,60 @@ public final class Formatadores {
     /** Devolve {@code null} quando o texto e nulo ou so possui espacos. */
     public static String textoOuNulo(String texto) {
         return texto == null || texto.isBlank() ? null : texto.trim();
+    }
+
+    // ------------------------------------------------------------------
+    // Horas e datas/horas compostas (UC06)
+    // ------------------------------------------------------------------
+
+    /** Formato de hora das telas de itinerario: HH:mm, 24 horas. */
+    public static final DateTimeFormatter HORA =
+            DateTimeFormatter.ofPattern("HH:mm").withResolverStyle(ResolverStyle.STRICT);
+
+    public static String formatarHora(LocalTime hora) {
+        return hora == null ? "" : hora.format(HORA);
+    }
+
+    /**
+     * Converte "HH:mm" em {@link LocalTime}; vazio quando o texto e invalido.
+     * Aceita tambem "HH:mm:ss" e a forma "8:30", completando o zero a esquerda.
+     */
+    public static Optional<LocalTime> lerHora(String texto) {
+        if (texto == null || texto.isBlank()) {
+            return Optional.empty();
+        }
+        String limpo = texto.trim().replace('h', ':').replace('H', ':');
+        if (limpo.endsWith(":")) {
+            limpo = limpo.substring(0, limpo.length() - 1);
+        }
+        if (limpo.matches("\\d:\\d{2}")) {
+            limpo = "0" + limpo;
+        }
+        if (limpo.matches("\\d{1,2}")) {
+            limpo = (limpo.length() == 1 ? "0" + limpo : limpo) + ":00";
+        }
+        try {
+            return Optional.of(LocalTime.parse(limpo, HORA));
+        } catch (DateTimeParseException excecao) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Junta os textos de data e hora digitados em campos separados.
+     * Vazio quando qualquer um dos dois for invalido ou nao informado.
+     */
+    public static Optional<LocalDateTime> lerDataHora(String data, String hora) {
+        Optional<LocalDate> dia = lerData(data);
+        Optional<LocalTime> instante = lerHora(hora);
+        if (dia.isEmpty() || instante.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(LocalDateTime.of(dia.get(), instante.get()));
+    }
+
+    /** "05/05/2026 08:30h", formato usado nos cartoes do cronograma (UC06). */
+    public static String formatarMomento(LocalDateTime momento) {
+        return momento == null ? "" : formatarDataHora(momento) + "h";
     }
 }

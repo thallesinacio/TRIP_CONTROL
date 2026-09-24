@@ -1,8 +1,11 @@
 package com.tripcontrol.app;
 
 import com.tripcontrol.controller.AutenticacaoController;
+import com.tripcontrol.controller.CalculadoraFinanceira;
 import com.tripcontrol.controller.ClienteController;
+import com.tripcontrol.controller.ItinerarioController;
 import com.tripcontrol.controller.PacoteController;
+import com.tripcontrol.controller.PagamentoController;
 import com.tripcontrol.controller.ReservaController;
 import com.tripcontrol.repository.ClienteRepository;
 import com.tripcontrol.repository.ItinerarioRepository;
@@ -48,9 +51,12 @@ public class ContextoAplicacao {
     private final RecursoRepository recursoRepository;
     private final UsuarioRepository usuarioRepository;
 
+    private final CalculadoraFinanceira calculadoraFinanceira;
     private final PacoteController pacoteController;
     private final ClienteController clienteController;
     private final ReservaController reservaController;
+    private final PagamentoController pagamentoController;
+    private final ItinerarioController itinerarioController;
     private final AutenticacaoController autenticacaoController;
 
     /**
@@ -122,10 +128,16 @@ public class ContextoAplicacao {
         this.recursoRepository = recursoRepository;
         this.usuarioRepository = usuarioRepository;
 
+        this.calculadoraFinanceira = new CalculadoraFinanceira(parcelaRepository, pagamentoRepository);
         this.pacoteController = new PacoteController(pacoteRepository, reservaRepository);
         this.clienteController = new ClienteController(clienteRepository, reservaRepository, pacoteRepository);
         this.reservaController = new ReservaController(reservaRepository, pacoteRepository,
-                clienteRepository, pagamentoRepository, pacoteController);
+                clienteRepository, calculadoraFinanceira, pacoteController);
+        this.pagamentoController = new PagamentoController(reservaController, reservaRepository,
+                parcelaRepository, pagamentoRepository, clienteRepository, pacoteRepository,
+                calculadoraFinanceira);
+        this.itinerarioController = new ItinerarioController(itinerarioRepository,
+                recursoRepository, pacoteRepository, pacoteController);
         this.autenticacaoController = new AutenticacaoController(usuarioRepository);
     }
 
@@ -139,6 +151,18 @@ public class ContextoAplicacao {
 
     public ReservaController getReservaController() {
         return reservaController;
+    }
+
+    public PagamentoController getPagamentoController() {
+        return pagamentoController;
+    }
+
+    public ItinerarioController getItinerarioController() {
+        return itinerarioController;
+    }
+
+    public CalculadoraFinanceira getCalculadoraFinanceira() {
+        return calculadoraFinanceira;
     }
 
     public AutenticacaoController getAutenticacaoController() {

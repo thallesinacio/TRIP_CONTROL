@@ -4,6 +4,7 @@ import com.tripcontrol.model.Pagamento;
 import com.tripcontrol.repository.PagamentoRepository;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -54,5 +55,21 @@ public class InMemoryPagamentoRepository extends RepositorioEmMemoria<Pagamento>
                 .filter(pagamento -> (inicio == null || !pagamento.getDataRecebimento().isBefore(inicio))
                         && (fim == null || !pagamento.getDataRecebimento().isAfter(fim)))
                 .toList();
+    }
+
+    /**
+     * Numero de recibo sequencial. Toma como base o maior numero ja gravado, e nao a
+     * quantidade de registros, para que a remocao de um pagamento nunca faca a
+     * sequencia reaproveitar um numero de recibo ja emitido.
+     */
+    @Override
+    public synchronized String proximoNumeroRecibo() {
+        long ultimo = registros.values().stream()
+                .map(Pagamento::getNumeroRecibo)
+                .filter(numero -> numero != null && numero.matches("RC-\\d+"))
+                .map(numero -> Long.parseLong(numero.substring(3)))
+                .max(Comparator.naturalOrder())
+                .orElse(0L);
+        return String.format("RC-%06d", ultimo + 1);
     }
 }

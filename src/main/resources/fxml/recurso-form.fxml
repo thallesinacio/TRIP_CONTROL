@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+    Cadastro rapido de hospedagem, transporte ou atividade (decisao B da equipe).
+    Abre como dialogo modal a partir da tela de Itinerarios: e o atalho previsto no
+    passo 5.2 do FA02 do UC06, e por isso nao entra no menu lateral.
+-->
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tripcontrol.view.RecursoFormController"
+      spacing="14.0" styleClass="cartao" prefWidth="460.0">
+    <padding>
+        <Insets top="24.0" right="26.0" bottom="22.0" left="26.0"/>
+    </padding>
+
+    <Label text="Cadastrar Novo Registro" styleClass="titulo-secao"/>
+    <Label text="Hospedagens, transportes e atividades precisam estar cadastrados antes de entrar no cronograma."
+           wrapText="true" styleClass="texto-secundario"/>
+
+    <VBox spacing="6.0">
+        <Label text="Tipo" styleClass="rotulo-campo"/>
+        <ComboBox fx:id="cboTipo" maxWidth="Infinity" promptText="Selecione o tipo"/>
+        <Label fx:id="lblErroTipo" styleClass="mensagem-erro" wrapText="true"
+               managed="false" visible="false"/>
+    </VBox>
+
+    <VBox spacing="6.0">
+        <Label text="Nome do Serviço / Serviço Prestado" styleClass="rotulo-campo"/>
+        <TextField fx:id="txtNome" promptText="Ex: Hotel Laghetto Premio ou Voo G3 1402"/>
+        <Label fx:id="lblErroNome" styleClass="mensagem-erro" wrapText="true"
+               managed="false" visible="false"/>
+    </VBox>
+
+    <VBox spacing="6.0">
+        <Label text="Local" styleClass="rotulo-campo"/>
+        <TextField fx:id="txtLocal" promptText="Endereço ou ponto de referência"/>
+    </VBox>
+
+    <VBox spacing="6.0">
+        <Label text="Contato" styleClass="rotulo-campo"/>
+        <TextField fx:id="txtContato" promptText="Telefone ou e-mail do fornecedor"/>
+    </VBox>
+
+    <VBox spacing="6.0">
+        <Label text="Descrição" styleClass="rotulo-campo"/>
+        <TextArea fx:id="txtDescricao" prefRowCount="3" wrapText="true"
+                  promptText="Observações sobre o serviço..."/>
+    </VBox>
+
+    <HBox spacing="12.0">
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnCancelar" text="Cancelar" onAction="#aoCancelar" styleClass="botao-secundario"/>
+        <Button fx:id="btnSalvar" text="Salvar Registro" onAction="#aoSalvar"
+                defaultButton="true" styleClass="botao-primario"/>
+    </HBox>
+</VBox>

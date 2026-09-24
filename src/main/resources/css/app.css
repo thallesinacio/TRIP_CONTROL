@@ -507,3 +507,66 @@
     -fx-text-fill: -cor-texto-secundario;
     -fx-font-size: 11px;
 }
+
+/* ------------- Tela de pagamentos (UC05) ------------- */
+
+.chip-quitada {
+    -fx-background-color: #D1FAE5;
+    -fx-text-fill: #047857;
+}
+
+.chip-atrasada {
+    -fx-background-color: #FEE2E2;
+    -fx-text-fill: #B91C1C;
+}
+
+/* ------------- Tela de itinerarios (UC06) ------------- */
+
+.cartao-item {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 12;
+    -fx-border-color: -cor-borda;
+    -fx-border-radius: 12;
+}
+
+.item-titulo {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -cor-texto;
+}
+
+.item-detalhes {
+    -fx-text-fill: -cor-texto-secundario;
+    -fx-font-size: 12px;
+}
+
+.tag-tipo {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 6;
+}
+
+.tag-tipo-transporte {
+    -fx-background-color: #DBEAFE;
+    -fx-text-fill: #1D4ED8;
+}
+
+.tag-tipo-hospedagem {
+    -fx-background-color: -cor-menta;
+    -fx-text-fill: -cor-marca-escura;
+}
+
+.tag-tipo-atividade {
+    -fx-background-color: #FEF3C7;
+    -fx-text-fill: #92400E;
+}
+
+.tag-rascunho {
+    -fx-background-color: #E2E8F0;
+    -fx-text-fill: #475569;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 6;
+}

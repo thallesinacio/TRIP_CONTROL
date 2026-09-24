@@ -7,6 +7,7 @@ import com.tripcontrol.model.Pacote;
 import com.tripcontrol.repository.memory.InMemoryClienteRepository;
 import com.tripcontrol.repository.memory.InMemoryPacoteRepository;
 import com.tripcontrol.repository.memory.InMemoryPagamentoRepository;
+import com.tripcontrol.repository.memory.InMemoryParcelaRepository;
 import com.tripcontrol.repository.memory.InMemoryReservaRepository;
 import com.tripcontrol.repository.ClienteRepository;
 import com.tripcontrol.repository.PacoteRepository;
@@ -176,7 +177,9 @@ class PacoteControllerTest {
         clienteRepository.salvar(cliente);
         ReservaController reservaController =
                 new ReservaController(reservaRepository, pacoteRepository, clienteRepository,
-                        new InMemoryPagamentoRepository(), controller);
+                        new CalculadoraFinanceira(new InMemoryParcelaRepository(),
+                                new InMemoryPagamentoRepository()),
+                        controller);
         Resultado<?> resultado = reservaController.registrar(new DadosReserva(
                 cliente.getId(), pacote.getId(), String.valueOf(viajantes),
                 Formatadores.formatarData(pacote.getDataInicio()),

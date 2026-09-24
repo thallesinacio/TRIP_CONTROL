@@ -2,10 +2,12 @@ package com.tripcontrol.app;
 
 import com.tripcontrol.controller.dto.DadosCliente;
 import com.tripcontrol.controller.dto.DadosPacote;
+import com.tripcontrol.controller.dto.DadosRecurso;
 import com.tripcontrol.controller.dto.DadosReserva;
 import com.tripcontrol.model.Cliente;
 import com.tripcontrol.model.Pacote;
 import com.tripcontrol.model.PerfilAcesso;
+import com.tripcontrol.model.TipoItemItinerario;
 import com.tripcontrol.util.Formatadores;
 
 import java.math.BigDecimal;
@@ -84,6 +86,10 @@ public final class DadosDemonstracao {
                     null));
         }
 
+        // Hospedagens, transportes e atividades sao pre-condicao do UC06: sem eles a
+        // lista do passo 5 nasceria vazia e a tela nao teria como ser experimentada.
+        cadastrarRecursos(contexto);
+
         // Ocupa todas as vagas do pacote de Reveillon (situacao "Lotado" no UC04).
         if (reveillon != null && carlos != null) {
             contexto.getReservaController().registrar(new DadosReserva(
@@ -92,6 +98,27 @@ public final class DadosDemonstracao {
                     Formatadores.formatarData(reveillon.getDataFim()),
                     "Grupo familiar."));
         }
+    }
+
+    private static void cadastrarRecursos(ContextoAplicacao contexto) {
+        criarRecurso(contexto, TipoItemItinerario.HOSPEDAGEM, "Hotel Laghetto Premio",
+                "Av. Borges de Medeiros, 1200 - Gramado");
+        criarRecurso(contexto, TipoItemItinerario.HOSPEDAGEM, "Pousada Vale dos Pinheiros",
+                "Rua das Hortensias, 88 - Canela");
+        criarRecurso(contexto, TipoItemItinerario.TRANSPORTE, "Voo GRU - POA",
+                "Aeroporto de Guarulhos");
+        criarRecurso(contexto, TipoItemItinerario.TRANSPORTE, "Transfer Aeroporto - Hotel",
+                "Aeroporto Salgado Filho");
+        criarRecurso(contexto, TipoItemItinerario.ATIVIDADE, "Tour de Maria Fumaca e Vinicola",
+                "Centro de Bento Goncalves");
+        criarRecurso(contexto, TipoItemItinerario.ATIVIDADE, "City tour historico",
+                "Praca central");
+    }
+
+    private static void criarRecurso(ContextoAplicacao contexto, TipoItemItinerario tipo,
+                                     String nome, String local) {
+        contexto.getItinerarioController().cadastrarRecurso(
+                new DadosRecurso(tipo, nome, local, null, null));
     }
 
     /**

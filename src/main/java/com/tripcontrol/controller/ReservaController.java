@@ -7,14 +7,11 @@ import com.tripcontrol.model.Cancelamento;
 import com.tripcontrol.model.Cliente;
 import com.tripcontrol.model.MotivoCancelamento;
 import com.tripcontrol.model.Pacote;
-import com.tripcontrol.model.Pagamento;
 import com.tripcontrol.model.Reserva;
-import com.tripcontrol.model.SituacaoFinanceira;
 import com.tripcontrol.model.StatusReserva;
 import com.tripcontrol.repository.ClienteRepository;
 import com.tripcontrol.repository.PacoteRepository;
 import com.tripcontrol.repository.ConflitoDeConcorrenciaException;
-import com.tripcontrol.repository.PagamentoRepository;
 import com.tripcontrol.repository.ReservaRepository;
 import com.tripcontrol.util.Conexoes;
 import com.tripcontrol.util.Formatadores;
@@ -44,18 +41,18 @@ public class ReservaController {
     private final ReservaRepository reservaRepository;
     private final PacoteRepository pacoteRepository;
     private final ClienteRepository clienteRepository;
-    private final PagamentoRepository pagamentoRepository;
+    private final CalculadoraFinanceira calculadora;
     private final PacoteController pacoteController;
 
     public ReservaController(ReservaRepository reservaRepository,
                              PacoteRepository pacoteRepository,
                              ClienteRepository clienteRepository,
-                             PagamentoRepository pagamentoRepository,
+                             CalculadoraFinanceira calculadora,
                              PacoteController pacoteController) {
         this.reservaRepository = reservaRepository;
         this.pacoteRepository = pacoteRepository;
         this.clienteRepository = clienteRepository;
-        this.pagamentoRepository = pagamentoRepository;
+        this.calculadora = calculadora;
         this.pacoteController = pacoteController;
     }
 
@@ -242,29 +239,15 @@ public class ReservaController {
     }
 
     /**
-     * Total pago e saldo pendente da reserva (UC07, passo 4), derivados dos
-     * pagamentos registrados. O UC05 ainda nao foi implementado, entao hoje o
-     * total pago e zero para toda reserva.
+     * Total pago, saldo pendente e situacao financeira da reserva (UC07, passo 4).
+     *
+     * <p>Delega a {@link CalculadoraFinanceira}, a mesma usada pelo UC05, para que a
+     * tela de cancelamento e a de pagamentos nunca mostrem numeros diferentes para a
+     * mesma reserva. Com o UC05 implementado, a situacao {@code ATRASADA} tambem passa
+     * a aparecer aqui, porque o calculo agora enxerga o vencimento das parcelas.</p>
      */
     public ResumoFinanceiro resumoFinanceiro(Reserva reserva) {
-        BigDecimal valorTotal = reserva.getValorTotal() == null ? BigDecimal.ZERO : reserva.getValorTotal();
-        BigDecimal totalPago = pagamentoRepository.buscarPorReserva(reserva.getId()).stream()
-                .map(Pagamento::getValor)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal saldo = valorTotal.subtract(totalPago).max(BigDecimal.ZERO);
-
-        SituacaoFinanceira situacao;
-        if (totalPago.compareTo(BigDecimal.ZERO) <= 0) {
-            situacao = SituacaoFinanceira.PENDENTE;
-        } else if (saldo.compareTo(BigDecimal.ZERO) <= 0) {
-            situacao = SituacaoFinanceira.QUITADA;
-        } else {
-            situacao = SituacaoFinanceira.PARCIALMENTE_PAGA;
-        }
-        // A situacao ATRASADA depende do vencimento das parcelas e entra com o UC05.
-
-        return new ResumoFinanceiro(valorTotal, totalPago, saldo, situacao);
+        return calculadora.resumoDe(reserva);
     }
 
     /** @return quantidade de vagas que voltam ao pacote se a reserva for cancelada (UC07, passo 7). */

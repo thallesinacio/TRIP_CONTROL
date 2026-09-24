@@ -1,0 +1,6 @@
+# Normaliza os finais de linha no repositorio.
+# Sem isso, salvar um arquivo no Windows troca LF por CRLF, o checksum que o
+# Flyway guarda para cada migracao deixa de bater e a aplicacao recusa subir.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf

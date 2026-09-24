@@ -12,6 +12,7 @@ import com.tripcontrol.repository.ReservaRepository;
 import com.tripcontrol.repository.memory.InMemoryClienteRepository;
 import com.tripcontrol.repository.memory.InMemoryPacoteRepository;
 import com.tripcontrol.repository.memory.InMemoryPagamentoRepository;
+import com.tripcontrol.repository.memory.InMemoryParcelaRepository;
 import com.tripcontrol.repository.memory.InMemoryReservaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +49,9 @@ class ReservaControllerTest {
         Clock relogioFixo = Clock.fixed(HOJE.atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneId.of("UTC"));
         pacoteController = new PacoteController(pacoteRepository, reservaRepository, relogioFixo);
         controller = new ReservaController(reservaRepository, pacoteRepository, clienteRepository,
-                new InMemoryPagamentoRepository(), pacoteController);
+                new CalculadoraFinanceira(new InMemoryParcelaRepository(),
+                        new InMemoryPagamentoRepository(), relogioFixo),
+                pacoteController);
 
         pacote = pacoteController.cadastrar(new DadosPacote("Gramado & Canela, RS",
                 "05/05/2026", "12/05/2026", null, "3490,00", "10", null)).getDado().orElseThrow();

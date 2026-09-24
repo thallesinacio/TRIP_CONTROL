@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.tripcontrol.view.PagamentoViewController"
+      spacing="20.0">
+
+    <!-- Pesquisa da reserva (UC05, passos 2 e 3) -->
+    <VBox styleClass="cartao" spacing="12.0">
+        <padding>
+            <Insets top="20.0" right="24.0" bottom="20.0" left="24.0"/>
+        </padding>
+
+        <GridPane hgap="16.0" vgap="6.0">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="22.0"/>
+                <ColumnConstraints percentWidth="22.0"/>
+                <ColumnConstraints percentWidth="26.0"/>
+                <ColumnConstraints percentWidth="18.0"/>
+                <ColumnConstraints percentWidth="12.0"/>
+            </columnConstraints>
+
+            <VBox spacing="6.0" GridPane.columnIndex="0">
+                <Label text="Código da Reserva" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtCodigoReserva" promptText="RE-999"/>
+            </VBox>
+            <VBox spacing="6.0" GridPane.columnIndex="1">
+                <Label text="CPF do Cliente" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtCpfCliente" promptText="000.000.000-00"/>
+            </VBox>
+            <!-- Nome do Cliente nao aparece no protótipo, mas o passo 2 do UC05 o exige. -->
+            <VBox spacing="6.0" GridPane.columnIndex="2">
+                <Label text="Nome do Cliente" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtNomeCliente" promptText="Nome do titular da reserva"/>
+            </VBox>
+            <VBox spacing="6.0" GridPane.columnIndex="3">
+                <Label text="Código do Pacote" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtCodigoPacote" promptText="PC-000"/>
+            </VBox>
+            <VBox spacing="6.0" alignment="BOTTOM_RIGHT" GridPane.columnIndex="4">
+                <Button fx:id="btnFiltrar" text="Filtrar" onAction="#aoFiltrar"
+                        maxWidth="Infinity" defaultButton="true" styleClass="botao-primario"/>
+            </VBox>
+        </GridPane>
+
+        <Label fx:id="lblMensagemPesquisa" styleClass="mensagem-erro" wrapText="true"
+               managed="false" visible="false"/>
+
+        <!-- Passo 3: so aparece quando a pesquisa devolve mais de uma reserva. -->
+        <VBox fx:id="painelResultados" spacing="6.0" managed="false" visible="false">
+            <Label text="Selecione a reserva desejada" styleClass="rotulo-campo"/>
+            <TableView fx:id="tableReservas" prefHeight="140.0">
+                <columns>
+                    <TableColumn fx:id="colResultadoCodigo" text="Reserva" prefWidth="110.0"/>
+                    <TableColumn fx:id="colResultadoCliente" text="Cliente" prefWidth="240.0"/>
+                    <TableColumn fx:id="colResultadoPacote" text="Pacote" prefWidth="240.0"/>
+                    <TableColumn fx:id="colResultadoTotal" text="Valor Total" prefWidth="140.0"/>
+                    <TableColumn fx:id="colResultadoSituacao" text="Situação" prefWidth="120.0"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </VBox>
+
+    <GridPane hgap="24.0">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="62.0"/>
+            <ColumnConstraints percentWidth="38.0"/>
+        </columnConstraints>
+
+        <!-- Resumo financeiro e parcelas da reserva (UC05, passo 4) -->
+        <VBox GridPane.columnIndex="0" styleClass="cartao" spacing="14.0">
+            <padding>
+                <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
+            </padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <Label fx:id="lblCodigoReserva" text="RESERVA" styleClass="titulo-secao"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblSituacaoFinanceira" text="-" styleClass="chip-situacao"/>
+            </HBox>
+
+            <Label fx:id="lblCliente" text="Cliente: -" wrapText="true" styleClass="texto-secundario"/>
+
+            <GridPane hgap="18.0" vgap="4.0" styleClass="painel-financeiro">
+                <padding>
+                    <Insets top="14.0" right="16.0" bottom="14.0" left="16.0"/>
+                </padding>
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="34.0"/>
+                    <ColumnConstraints percentWidth="22.0"/>
+                    <ColumnConstraints percentWidth="22.0"/>
+                    <ColumnConstraints percentWidth="22.0"/>
+                </columnConstraints>
+
+                <Label text="Pacote Turístico" styleClass="rotulo-detalhe"
+                       GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Label text="Valor Total do Pacote" styleClass="rotulo-detalhe"
+                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="Total Pago" styleClass="rotulo-financeiro-positivo"
+                       GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                <Label text="Saldo Pendente" styleClass="rotulo-financeiro-negativo"
+                       GridPane.rowIndex="0" GridPane.columnIndex="3"/>
+
+                <Label fx:id="lblPacote" text="-" wrapText="true" styleClass="valor-detalhe"
+                       GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Label fx:id="lblValorTotal" text="-" styleClass="valor-detalhe"
+                       GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label fx:id="lblTotalPago" text="-" styleClass="valor-financeiro-positivo"
+                       GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                <Label fx:id="lblSaldoPendente" text="-" styleClass="valor-financeiro-negativo"
+                       GridPane.rowIndex="1" GridPane.columnIndex="3"/>
+            </GridPane>
+
+            <TableView fx:id="tableParcelas" prefHeight="220.0">
+                <columns>
+                    <TableColumn fx:id="colParcela" text="Parcela" prefWidth="80.0"/>
+                    <TableColumn fx:id="colVencimento" text="Vencimento" prefWidth="110.0"/>
+                    <TableColumn fx:id="colValor" text="Valor" prefWidth="120.0"/>
+                    <TableColumn fx:id="colRecebimento" text="Recebimento" prefWidth="110.0"/>
+                    <TableColumn fx:id="colForma" text="Forma de Pagto." prefWidth="130.0"/>
+                    <!-- Referencia da transacao: exigida pelo passo 4 do UC05. -->
+                    <TableColumn fx:id="colIdentificador" text="Referência" prefWidth="130.0"/>
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="100.0"/>
+                </columns>
+            </TableView>
+
+            <!-- Decisao A: o plano de parcelas nasce aqui, e so enquanto nao existir. -->
+            <VBox fx:id="painelParcelamento" spacing="8.0" styleClass="painel-historico"
+                  managed="false" visible="false">
+                <padding>
+                    <Insets top="14.0" right="16.0" bottom="14.0" left="16.0"/>
+                </padding>
+                <Label text="Definir Parcelamento" styleClass="rotulo-campo"/>
+                <Label text="Esta reserva ainda não tem plano de parcelas. Informe em quantas vezes o valor será dividido."
+                       wrapText="true" styleClass="nota-calculo"/>
+                <HBox spacing="12.0" alignment="BOTTOM_LEFT">
+                    <VBox spacing="6.0" prefWidth="140.0">
+                        <Label text="Qtd. de Parcelas" styleClass="rotulo-campo"/>
+                        <TextField fx:id="txtQuantidadeParcelas" promptText="Ex: 3"/>
+                    </VBox>
+                    <VBox spacing="6.0" prefWidth="180.0">
+                        <Label text="1º Vencimento" styleClass="rotulo-campo"/>
+                        <DatePicker fx:id="dpPrimeiroVencimento" maxWidth="Infinity"/>
+                    </VBox>
+                    <Button fx:id="btnDefinirParcelamento" text="Gerar Parcelas"
+                            onAction="#aoDefinirParcelamento" styleClass="botao-secundario"/>
+                </HBox>
+                <Label fx:id="lblErroQuantidadeParcelas" styleClass="mensagem-erro" wrapText="true"
+                       managed="false" visible="false"/>
+                <Label fx:id="lblErroPrimeiroVencimento" styleClass="mensagem-erro" wrapText="true"
+                       managed="false" visible="false"/>
+            </VBox>
+
+            <Label fx:id="lblAvisoReservaCancelada" wrapText="true" styleClass="aviso-bloqueio"
+                   managed="false" visible="false"/>
+        </VBox>
+
+        <!-- Registro do recebimento (UC05, passos 5 a 7) -->
+        <VBox fx:id="painelRegistro" GridPane.columnIndex="1" styleClass="cartao" spacing="12.0">
+            <padding>
+                <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
+            </padding>
+
+            <Label text="Registrar Recebimento" styleClass="titulo-secao"/>
+            <Label text="Dê baixa em uma parcela pendente do cliente"
+                   wrapText="true" styleClass="texto-secundario"/>
+
+            <VBox spacing="6.0">
+                <Label text="Valor Recebido (R$)" styleClass="rotulo-campo"/>
+                <TextField fx:id="txtValorRecebido" promptText="0,00"/>
+                <Label fx:id="lblErroValorRecebido" styleClass="mensagem-erro" wrapText="true"
+                       managed="false" visible="false"/>
+            </VBox>
+
+            <VBox spacing="6.0">
+                <Label text="Data do Recebimento" styleClass="rotulo-campo"/>
+                <DatePicker fx:id="dpDataRecebimento" maxWidth="Infinity"/>
+                <Label fx:id="lblErroDataRecebimento" styleClass="mensagem-erro" wrapText="true"
+                       managed="false" visible="false"/>
+            </VBox>
+
+            <VBox spacing="6.0">
+                <Label text="Forma de Pagamento" styleClass="rotulo-campo"/>
+                <ComboBox fx:id="cboFormaPagamento" maxWidth="Infinity" promptText="Selecione"/>
+                <Label fx:id="lblErroFormaPagamento" styleClass="mensagem-erro" wrapText="true"
+                       managed="false" visible="false"/>
+            </VBox>
+
+            <GridPane hgap="12.0">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="46.0"/>
+                    <ColumnConstraints percentWidth="54.0"/>
+                </columnConstraints>
+                <VBox spacing="6.0" GridPane.columnIndex="0">
+                    <Label text="Nº da Parcela" styleClass="rotulo-campo"/>
+                    <ComboBox fx:id="cboNumeroParcela" maxWidth="Infinity" promptText="Parcela"/>
+                </VBox>
+                <VBox spacing="6.0" GridPane.columnIndex="1">
+                    <Label text="Identificador Transação" styleClass="rotulo-campo"/>
+                    <TextField fx:id="txtIdentificadorTransacao" promptText="Ex: Autenticação PIX"/>
+                </VBox>
+            </GridPane>
+            <Label fx:id="lblVencimentoParcela" styleClass="nota-calculo" wrapText="true"/>
+            <Label fx:id="lblErroNumeroParcela" styleClass="mensagem-erro" wrapText="true"
+                   managed="false" visible="false"/>
+
+            <VBox spacing="6.0">
+                <Label text="Observação Interna" styleClass="rotulo-campo"/>
+                <TextArea fx:id="txtObservacao" prefRowCount="3" wrapText="true"
+                          promptText="Insira qualquer detalhe ou comprovante adicional aqui..."/>
+            </VBox>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button fx:id="btnConfirmarPagamento" text="Confirmar Pagamento"
+                    onAction="#aoConfirmarPagamento" maxWidth="Infinity" styleClass="botao-primario"/>
+            <!-- FA06: descarta o preenchimento sem tocar no historico financeiro. -->
+            <Button fx:id="btnCancelarRegistro" text="Cancelar" onAction="#aoCancelarRegistro"
+                    maxWidth="Infinity" styleClass="botao-secundario"/>
+        </VBox>
+    </GridPane>
+</VBox>

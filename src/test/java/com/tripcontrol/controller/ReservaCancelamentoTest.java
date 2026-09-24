@@ -16,10 +16,12 @@ import com.tripcontrol.model.StatusReserva;
 import com.tripcontrol.repository.ClienteRepository;
 import com.tripcontrol.repository.PacoteRepository;
 import com.tripcontrol.repository.PagamentoRepository;
+import com.tripcontrol.repository.ParcelaRepository;
 import com.tripcontrol.repository.ReservaRepository;
 import com.tripcontrol.repository.memory.InMemoryClienteRepository;
 import com.tripcontrol.repository.memory.InMemoryPacoteRepository;
 import com.tripcontrol.repository.memory.InMemoryPagamentoRepository;
+import com.tripcontrol.repository.memory.InMemoryParcelaRepository;
 import com.tripcontrol.repository.memory.InMemoryReservaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -53,6 +55,7 @@ class ReservaCancelamentoTest {
     private PacoteRepository pacoteRepository;
     private ClienteRepository clienteRepository;
     private PagamentoRepository pagamentoRepository;
+    private ParcelaRepository parcelaRepository;
     private PacoteController pacoteController;
     private ReservaController controller;
 
@@ -75,10 +78,13 @@ class ReservaCancelamentoTest {
         clienteRepository = clienteRepository == null ? new InMemoryClienteRepository() : clienteRepository;
         pagamentoRepository = pagamentoRepository == null
                 ? new InMemoryPagamentoRepository() : pagamentoRepository;
+        parcelaRepository = parcelaRepository == null
+                ? new InMemoryParcelaRepository() : parcelaRepository;
         Clock relogioFixo = Clock.fixed(HOJE.atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneId.of("UTC"));
         pacoteController = new PacoteController(pacoteRepository, reservaRepository, relogioFixo);
         controller = new ReservaController(reservaRepository, pacoteRepository, clienteRepository,
-                pagamentoRepository, pacoteController);
+                new CalculadoraFinanceira(parcelaRepository, pagamentoRepository, relogioFixo),
+                pacoteController);
     }
 
     private Pacote criarPacote() {
