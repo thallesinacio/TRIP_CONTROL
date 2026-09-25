@@ -4,6 +4,7 @@ import com.tripcontrol.controller.dto.DadosPacote;
 import com.tripcontrol.controller.dto.PacoteComVagas;
 import com.tripcontrol.controller.dto.DadosReserva;
 import com.tripcontrol.model.Pacote;
+import com.tripcontrol.model.SituacaoPacote;
 import com.tripcontrol.repository.memory.InMemoryClienteRepository;
 import com.tripcontrol.repository.memory.InMemoryPacoteRepository;
 import com.tripcontrol.repository.memory.InMemoryPagamentoRepository;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -128,6 +130,23 @@ class PacoteControllerTest {
 
         assertEquals(4, linha.vagasOcupadas());
         assertEquals(26, linha.vagasDisponiveis());
+    }
+
+    @Test
+    @DisplayName("UC04: situacao distingue disponivel, lotado e encerrado")
+    void apresentaAsTresSituacoesDoPacote() {
+        Pacote futuro = controller.cadastrar(dadosValidos()).getDado().orElseThrow();
+        assertEquals(SituacaoPacote.DISPONIVEL, controller.comVagas(futuro).situacao());
+
+        registrarReserva(futuro, 30);
+        assertEquals(SituacaoPacote.LOTADO, controller.comVagas(futuro).situacao());
+        assertEquals(0, controller.comVagas(futuro).vagasDisponiveis());
+
+        Pacote passado = new Pacote("Salvador, BA", HOJE.minusDays(8), HOJE.minusDays(1),
+                null, new BigDecimal("1000.00"), 10, null);
+        passado.setCodigo(pacoteRepository.proximoCodigo());
+        pacoteRepository.salvar(passado);
+        assertEquals(SituacaoPacote.ENCERRADO, controller.comVagas(passado).situacao());
     }
 
     @Test

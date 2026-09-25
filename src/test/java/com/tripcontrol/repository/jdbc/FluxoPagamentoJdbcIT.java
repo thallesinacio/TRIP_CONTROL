@@ -9,6 +9,9 @@ import com.tripcontrol.controller.StatusResultado;
 import com.tripcontrol.controller.dto.ComprovantePagamento;
 import com.tripcontrol.controller.dto.DadosPagamento;
 import com.tripcontrol.controller.dto.DadosParcelamento;
+import com.tripcontrol.controller.dto.DadosReserva;
+import com.tripcontrol.controller.dto.PacoteComVagas;
+import com.tripcontrol.controller.dto.ResumoReserva;
 import com.tripcontrol.controller.dto.SituacaoPagamentos;
 import com.tripcontrol.model.Cancelamento;
 import com.tripcontrol.model.Cliente;
@@ -190,6 +193,78 @@ class FluxoPagamentoJdbcIT extends RepositorioJdbcIT {
         assertTrue(situacao.isBloqueadaParaPagamento());
         assertEquals(0, new BigDecimal("3490.00").compareTo(situacao.financeiro().totalPago()),
                 "o historico financeiro continua visivel");
+    }
+
+    @Test
+    @DisplayName("Reserva, pagamento e cancelamento atualizam vagas e preservam o historico no PostgreSQL")
+    void reservaPagamentoCancelamentoAtualizaVagas() {
+        PacoteController pacoteController = new PacoteController(pacotes, reservas, RELOGIO);
+        CalculadoraFinanceira calculadora = new CalculadoraFinanceira(parcelas, pagamentos, RELOGIO);
+        ReservaController reservaController = new ReservaController(reservas, pacotes, clientes,
+                calculadora, pacoteController);
+        Pacote pacote = pacotes.buscarPorId(reserva.getPacoteId()).orElseThrow();
+
+        assertEquals(2, pacoteController.comVagas(pacote).vagasOcupadas());
+        assertEquals(8, pacoteController.comVagas(pacote).vagasDisponiveis());
+
+        Resultado<ResumoReserva> criada = reservaController.registrar(new DadosReserva(
+                reserva.getClienteId(), pacote.getId(), "3", "05/05/2026", "12/05/2026", null));
+        assertTrue(criada.isSucesso());
+        Reserva novaReserva = criada.getDado().orElseThrow().reserva();
+        assertEquals(5, pacoteController.comVagas(pacote).vagasOcupadas());
+        assertEquals(5, pacoteController.comVagas(pacote).vagasDisponiveis());
+
+        Resultado<SituacaoPagamentos> plano = controller.definirParcelamento(novaReserva.getId(),
+                new DadosParcelamento("1", "10/03/2026"));
+        assertTrue(plano.isSucesso());
+        long versaoFinanceira = controller.abrir(novaReserva.getId())
+                .getDado().orElseThrow().versaoFinanceira();
+        Resultado<ComprovantePagamento> recebido = controller.registrarRecebimento(novaReserva.getId(),
+                new DadosPagamento("10470,00", "10/03/2026", FormaPagamento.PIX,
+                        "1", "PIX-FLUXO-INTEGRADO", null), versaoFinanceira);
+        assertTrue(recebido.isSucesso());
+        assertEquals(SituacaoFinanceira.QUITADA, recebido.getDado().orElseThrow().situacao());
+
+        Resultado<ResumoReserva> cancelada = reservaController.cancelar(novaReserva.getId(),
+                MotivoCancelamento.DESISTENCIA_CLIENTE, null, "Ana Silva",
+                reservas.buscarPorId(novaReserva.getId()).orElseThrow().getVersao());
+        assertTrue(cancelada.isSucesso());
+        assertTrue(reservas.buscarPorId(novaReserva.getId()).orElseThrow().isCancelada());
+        assertEquals(2, pacoteController.comVagas(pacote).vagasOcupadas());
+        assertEquals(8, pacoteController.comVagas(pacote).vagasDisponiveis());
+        assertEquals(1, pagamentos.buscarPorReserva(novaReserva.getId()).size());
+        assertEquals(0, new BigDecimal("10470.00").compareTo(
+                controller.abrir(novaReserva.getId()).getDado().orElseThrow().financeiro().totalPago()));
+
+        Resultado<ComprovantePagamento> outroPagamento = controller.registrarRecebimento(novaReserva.getId(),
+                new DadosPagamento("10470,00", "10/03/2026", FormaPagamento.PIX,
+                        "1", "PIX-POS-CANCELAMENTO", null),
+                controller.abrir(novaReserva.getId()).getDado().orElseThrow().versaoFinanceira());
+        assertEquals(StatusResultado.OPERACAO_BLOQUEADA, outroPagamento.getStatus());
+    }
+
+    @Test
+    @DisplayName("Capacidade valida persiste no banco e capacidade abaixo da ocupacao nao altera dados")
+    void alteraCapacidadeComValidacaoNoBanco() {
+        PacoteController pacoteController = new PacoteController(pacotes, reservas, RELOGIO);
+        Pacote pacote = pacotes.buscarPorId(reserva.getPacoteId()).orElseThrow();
+        assertEquals(2, pacoteController.comVagas(pacote).vagasOcupadas());
+
+        Resultado<PacoteComVagas> valida = pacoteController.alterarCapacidade(pacote.getId(),
+                "3", "Ajuste do transporte", "Ana Silva", 2);
+        assertTrue(valida.isSucesso());
+        assertEquals(1, valida.getDado().orElseThrow().vagasDisponiveis());
+        assertEquals(3, pacotes.buscarPorId(pacote.getId()).orElseThrow().getCapacidadeTotal());
+        assertEquals(1, pacotes.buscarPorId(pacote.getId()).orElseThrow()
+                .getHistoricoCapacidade().size());
+
+        Resultado<PacoteComVagas> invalida = pacoteController.alterarCapacidade(pacote.getId(),
+                "1", "Reducao indevida", "Ana Silva", 2);
+        assertEquals(StatusResultado.ERRO_VALIDACAO, invalida.getStatus());
+        assertTrue(invalida.mensagemDoCampo("novaCapacidade").orElseThrow().contains("2"));
+        Pacote relido = pacotes.buscarPorId(pacote.getId()).orElseThrow();
+        assertEquals(3, relido.getCapacidadeTotal());
+        assertEquals(1, relido.getHistoricoCapacidade().size());
     }
 
     @Test
