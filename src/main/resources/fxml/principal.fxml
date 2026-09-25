@@ -62,7 +62,7 @@
 
     <!-- Conteudo -->
     <center>
-        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="area-rolagem">
+        <ScrollPane fitToWidth="true" styleClass="area-rolagem">
             <content>
                 <StackPane fx:id="areaConteudo" styleClass="area-conteudo">
                     <padding>

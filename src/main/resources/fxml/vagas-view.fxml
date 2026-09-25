@@ -37,10 +37,12 @@
             <TableView fx:id="tableVagas" prefHeight="460.0" VBox.vgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="colCodigo" text="Código" prefWidth="90.0"/>
-                    <TableColumn fx:id="colDestino" text="Destino" prefWidth="210.0"/>
+                    <TableColumn fx:id="colDestino" text="Destino" prefWidth="170.0"/>
                     <TableColumn fx:id="colInicio" text="Início" prefWidth="100.0"/>
+                    <TableColumn fx:id="colFim" text="Fim" prefWidth="100.0"/>
                     <TableColumn fx:id="colVagasTotais" text="Vagas Totais" prefWidth="100.0"/>
                     <TableColumn fx:id="colOcupadas" text="Ocupadas" prefWidth="90.0"/>
+                    <TableColumn fx:id="colDisponiveis" text="Disponíveis" prefWidth="100.0"/>
                     <TableColumn fx:id="colSituacao" text="Situação" prefWidth="110.0"/>
                 </columns>
             </TableView>

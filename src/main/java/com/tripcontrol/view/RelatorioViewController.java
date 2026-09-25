@@ -13,6 +13,7 @@ import com.tripcontrol.model.SituacaoPacote;
 import com.tripcontrol.model.StatusReserva;
 import com.tripcontrol.model.TipoRelatorio;
 import com.tripcontrol.util.Formatadores;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -26,6 +27,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -204,6 +206,8 @@ public class RelatorioViewController implements Initializable {
         if (resultado.isSucesso()) {
             relatorioGerado = resultado.getDado().orElseThrow();
             exibirPrevia(relatorioGerado);
+            exibirMensagem(resultado.getMensagem() + " Veja a prévia abaixo dos filtros.", false);
+            rolarParaPrevia();
             return;
         }
 
@@ -225,7 +229,7 @@ public class RelatorioViewController implements Initializable {
         }
 
         // FA03 (nenhum dado) e FA04 (falha na consulta): os filtros ficam como estao.
-        exibirMensagem(resultado.mensagensConsolidadas());
+        exibirMensagem(resultado.mensagensConsolidadas(), true);
     }
 
     /** FA06 - limpa os filtros sem consultar o banco nem criar arquivo. */
@@ -435,7 +439,21 @@ public class RelatorioViewController implements Initializable {
         exibir(painelPrevia, false);
     }
 
-    private void exibirMensagem(String mensagem) {
+    /** A prévia fica após os filtros e pode começar fora da área visível da janela. */
+    private void rolarParaPrevia() {
+        Platform.runLater(() -> {
+            for (Node atual = painelPrevia; atual != null; atual = atual.getParent()) {
+                if (atual instanceof ScrollPane rolagem) {
+                    rolagem.setVvalue(1.0);
+                    break;
+                }
+            }
+        });
+    }
+
+    private void exibirMensagem(String mensagem, boolean erro) {
+        lblMensagemGeracao.getStyleClass().removeAll("mensagem-erro", "texto-secundario");
+        lblMensagemGeracao.getStyleClass().add(erro ? "mensagem-erro" : "texto-secundario");
         lblMensagemGeracao.setText(mensagem);
         exibir(lblMensagemGeracao, true);
     }

@@ -23,6 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /** Tela do UC03 - Registrar Reservas, incluindo os fluxos FA01 a FA04. */
@@ -99,6 +100,9 @@ public class ReservaFormController implements Initializable {
         }
 
         if (resultado.getStatus() == StatusResultado.ERRO_VALIDACAO) {
+            if (resultado.mensagemDoCampo("pacote").isPresent()) {
+                recarregarListas();
+            }
             Alertas.marcarErro(cboCliente, lblErroCliente, resultado, "cliente");
             Alertas.marcarErro(cboPacote, lblErroPacote, resultado, "pacote");
             Alertas.marcarErro(txtQuantidadeViajantes, lblErroQuantidade, resultado, "quantidadeViajantes");
@@ -194,12 +198,25 @@ public class ReservaFormController implements Initializable {
         Cliente clienteSelecionado = cboCliente.getValue();
         Pacote pacoteSelecionado = cboPacote.getValue();
         cboCliente.setItems(FXCollections.observableArrayList(contexto.getClienteController().listar()));
-        cboPacote.setItems(FXCollections.observableArrayList(contexto.getPacoteController().listar()));
+        List<Pacote> pacotesDisponiveis = contexto.getPacoteController().listarDisponiveis();
+        cboPacote.setItems(FXCollections.observableArrayList(pacotesDisponiveis));
+        cboPacote.setValue(null);
         if (clienteSelecionado != null) {
             cboCliente.getSelectionModel().select(clienteSelecionado);
         }
         if (pacoteSelecionado != null) {
-            cboPacote.getSelectionModel().select(pacoteSelecionado);
+            Pacote aindaDisponivel = pacotesDisponiveis.stream()
+                    .filter(pacote -> pacote.getId().equals(pacoteSelecionado.getId()))
+                    .findFirst()
+                    .orElse(null);
+            if (aindaDisponivel != null) {
+                cboPacote.getSelectionModel().select(aindaDisponivel);
+            } else {
+                dpDataInicio.setValue(null);
+                dpDataInicio.getEditor().clear();
+                dpDataFim.setValue(null);
+                dpDataFim.getEditor().clear();
+            }
         }
     }
 

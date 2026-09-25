@@ -76,6 +76,12 @@ class ReservaControllerTest {
         assertEquals("RE-8901", resumo.codigo());
         assertEquals(0, new BigDecimal("6980.00").compareTo(resumo.valorTotal()));
         assertEquals(2, pacoteController.vagasOcupadas(pacote.getId()));
+        assertTrue(resultado.getMensagem().contains("Código: " + resumo.codigo()));
+        assertTrue(resultado.getMensagem().contains("Cliente: " + cliente.getNome()));
+        assertTrue(resultado.getMensagem().contains("Pacote: " + pacote.getCodigo()));
+        assertTrue(resultado.getMensagem().contains("Período: 05/05/2026 a 12/05/2026"));
+        assertTrue(resultado.getMensagem().contains("Viajantes: 2"));
+        assertTrue(resultado.getMensagem().contains("Total: "));
     }
 
     @Test
@@ -98,6 +104,21 @@ class ReservaControllerTest {
 
         assertEquals(StatusResultado.ERRO_VALIDACAO, resultado.getStatus());
         assertTrue(resultado.mensagemDoCampo("dataInicio").orElseThrow().contains("05/05/2026"));
+        assertEquals(0L, reservaRepository.contar());
+    }
+
+    @Test
+    @DisplayName("UC03: pacote encerrado apos a selecao e recusado na gravacao")
+    void recusaPacoteQueEncerrouAntesDaConfirmacao() {
+        pacote.setDataInicio(HOJE.minusDays(8));
+        pacote.setDataFim(HOJE.minusDays(1));
+        pacoteRepository.atualizar(pacote);
+
+        Resultado<ResumoReserva> resultado = controller.registrar(new DadosReserva(
+                cliente.getId(), pacote.getId(), "2", "04/03/2026", "11/03/2026", null));
+
+        assertEquals(StatusResultado.ERRO_VALIDACAO, resultado.getStatus());
+        assertTrue(resultado.mensagemDoCampo("pacote").orElseThrow().contains("encerrado"));
         assertEquals(0L, reservaRepository.contar());
     }
 

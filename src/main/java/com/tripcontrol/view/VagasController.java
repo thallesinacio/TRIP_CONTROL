@@ -43,8 +43,10 @@ public class VagasController implements Initializable {
     @FXML private TableColumn<PacoteComVagas, String> colCodigo;
     @FXML private TableColumn<PacoteComVagas, String> colDestino;
     @FXML private TableColumn<PacoteComVagas, String> colInicio;
+    @FXML private TableColumn<PacoteComVagas, String> colFim;
     @FXML private TableColumn<PacoteComVagas, Number> colVagasTotais;
     @FXML private TableColumn<PacoteComVagas, Number> colOcupadas;
+    @FXML private TableColumn<PacoteComVagas, Number> colDisponiveis;
     @FXML private TableColumn<PacoteComVagas, SituacaoPacote> colSituacao;
 
     @FXML private VBox painelSemPacotes;
@@ -219,10 +221,14 @@ public class VagasController implements Initializable {
         colDestino.setCellValueFactory(celula -> texto(celula.getValue().destino()));
         colInicio.setCellValueFactory(celula ->
                 texto(Formatadores.formatarData(celula.getValue().pacote().getDataInicio())));
+        colFim.setCellValueFactory(celula ->
+                texto(Formatadores.formatarData(celula.getValue().pacote().getDataFim())));
         colVagasTotais.setCellValueFactory(celula ->
                 new SimpleIntegerProperty(celula.getValue().capacidadeTotal()));
         colOcupadas.setCellValueFactory(celula ->
                 new SimpleIntegerProperty(celula.getValue().vagasOcupadas()));
+        colDisponiveis.setCellValueFactory(celula ->
+                new SimpleIntegerProperty(celula.getValue().vagasDisponiveis()));
         colSituacao.setCellValueFactory(celula ->
                 new SimpleObjectProperty<>(celula.getValue().situacao()));
         colSituacao.setCellFactory(coluna -> new TableCell<>() {

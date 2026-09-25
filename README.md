@@ -8,14 +8,14 @@ disciplina de Engenharia de Software II (UNIVASF, 2026.2).
 | Linguagem | Java 21 |
 | Interface | JavaFX 21 (FXML + Controller separado) |
 | Build | Maven |
-| Persistência | PostgreSQL via JDBC puro (HikariCP + Flyway) — 1ª fatia ligada |
+| Persistência | PostgreSQL via JDBC (HikariCP + Flyway), com modo memória opcional |
 | Arquitetura | MVC com camada de repositório (padrão Repository/DAO) |
 
 ---
 
 ## Como rodar
 
-Pré-requisitos: JDK 21 e Maven 3.9+ (o IntelliJ já traz um Maven embutido).
+Pré-requisitos: JDK 21, Maven 3.9+ e PostgreSQL local.
 
 ```bash
 mvn clean javafx:run
@@ -24,39 +24,45 @@ mvn clean javafx:run
 Pelo IntelliJ: abrir o projeto, aguardar o download das dependências e executar
 `com.tripcontrol.Main` (ou o goal `javafx:run` na aba Maven).
 
+O [manual de uso](docs/manual-de-uso.md) descreve os fluxos das oito telas,
+incluindo reservas, vagas, pagamentos, itinerários, cancelamentos e relatórios.
+
 Rodar os testes:
 
 ```bash
-mvn test
+TRIPCONTROL_REPOSITORIO=memoria mvn test
 ```
 
 ### Acesso de demonstração
 
-Enquanto os dados vivem em memória, a aplicação cria um usuário de exemplo na
-inicialização (`DadosDemonstracao`):
+No modo JDBC, a migração `R__carga_inicial.sql` cria um usuário inicial. No
+modo memória, `DadosDemonstracao` cria o usuário e dados de exemplo:
 
 - **E-mail:** `ana.silva@tripcontrol.com`
 - **Senha:** `tripcontrol`
 
-Junto com ele são criados três pacotes, dois clientes e duas reservas, para que
-as telas já abram com conteúdo.
+No modo memória, são criados pacotes, clientes, reservas e recursos para
+experimentar as telas. O modo JDBC mantém os dados cadastrados entre execuções.
 
 ---
 
 ## Estado atual
 
-| Caso de uso | Regras (Controller) | Tela |
-|-------------|--------------------|------|
-| UC01 – Cadastrar Pacotes | completo, com FA01 a FA04 | completa |
-| UC02 – Cadastrar Clientes | completo, com FA01 a FA03 | completa |
-| UC03 – Registrar Reservas | completo, com FA01 a FA04 | completa |
-| UC04 – Controlar Vagas | completo, com FA01, FA03, FA04 e FA05 | completa |
-| UC05 – Gerenciar Pagamentos | completo, com FA01 a FA06 | completa |
-| UC06 – Montar Itinerário | completo, com FA01 a FA07 | completa |
-| UC07 – Cancelar Reservas | completo, com FA01 a FA06 | completa |
-| UC08 – Gerar Relatórios | completo, com FA01 a FA06 | completa |
+| Caso de uso | Regras | Tela |
+|-------------|--------|------|
+| UC01 – Cadastrar Pacotes | implementadas | disponível |
+| UC02 – Cadastrar Clientes | implementadas | disponível |
+| UC03 – Registrar Reservas | implementadas | disponível |
+| UC04 – Controlar Vagas | implementadas | disponível |
+| UC05 – Gerenciar Pagamentos | implementadas | disponível |
+| UC06 – Montar Itinerário | implementadas | disponível |
+| UC07 – Cancelar Reservas | implementadas | disponível |
+| UC08 – Gerar Relatórios | implementadas | disponível |
 
-Os oito casos de uso estão implementados ponta a ponta e rodam sobre o PostgreSQL.
+Os oito casos de uso têm telas e regras de negócio. Esta tabela indica
+existência da funcionalidade; não é uma declaração de aderência integral a
+todos os fluxos do documento funcional. O manual registra como operar as
+telas e as condições de uso do banco de dados.
 
 O cadastro de hospedagens, transportes e atividades que o UC06 pressupõe é um
 diálogo modal aberto pela tela de Itinerários, e não um item do menu lateral: o
@@ -72,7 +78,8 @@ src/main/java/com/tripcontrol/
 ├── app/                       # TripControlApp (JavaFX), ContextoAplicacao (injeção), DadosDemonstracao
 ├── model/                     # entidades de domínio e enums (POJOs puros)
 ├── repository/                # interfaces Repository/DAO
-│   └── memory/                # implementações em memória (fase atual)
+│   ├── jdbc/                  # implementações PostgreSQL
+│   └── memory/                # implementações em memória para testes e demonstração
 ├── controller/                # regras de aplicação dos casos de uso
 │   └── dto/                   # dados de formulário e projeções de leitura
 ├── view/                      # controllers das telas JavaFX + navegação
@@ -80,7 +87,8 @@ src/main/java/com/tripcontrol/
 src/main/resources/
 ├── fxml/                      # layout das telas
 ├── css/app.css                # identidade visual (protótipo do Figma)
-└── config/database.properties # parâmetros do banco (ainda não usados)
+├── config/                   # modo de persistência e conexão local
+└── db/migration/             # migrações Flyway do PostgreSQL
 src/test/java/com/tripcontrol/  # testes JUnit 5 das regras de negócio
 ```
 
@@ -135,16 +143,17 @@ ou pela propriedade de sistema `-Drepositorio.tipo=...`.
 src/main/resources/db/migration/
 ├── V1__criar_schema_inicial.sql   # o script da equipe, sem alteração
 ├── V2__ajustes_fatia_1.sql        # colunas e constraints que os casos de uso exigem
+├── V3__fatia_2_pagamentos_e_itinerario.sql # pagamentos, recursos e itinerários
 └── R__carga_inicial.sql           # usuário inicial (ana.silva@tripcontrol.com / tripcontrol)
 ```
 
-Uma migração já aplicada nunca é editada: correção entra como arquivo novo (`V3__...`).
+Uma migração já aplicada nunca é editada: correções entram em novas versões.
 
 ### Testes
 
 ```bash
-mvn clean test     # unidade, sempre em memória, não exige banco
-mvn clean verify   # inclui os testes de integração (*IT) contra o banco de teste
+TRIPCONTROL_REPOSITORIO=memoria mvn clean test     # unidade, não exige banco
+TRIPCONTROL_REPOSITORIO=memoria mvn clean verify   # inclui integração (*IT) no banco de teste
 ```
 
 Os testes de integração usam um banco separado e desfazem cada transação no fim.

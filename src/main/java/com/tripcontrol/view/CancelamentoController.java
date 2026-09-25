@@ -102,6 +102,8 @@ public class CancelamentoController implements Initializable {
         //  decidir com o professor se a política vira requisito formal antes de implementar.
         lblAvisoPoliticas.setText("O cancelamento devolve as vagas ao pacote e preserva o "
                 + "histórico de pagamentos da reserva.");
+        tableReservas.setPlaceholder(new Label(
+                "Informe um critério acima e clique em Consultar para localizar reservas."));
 
         limparDetalhes();
     }
@@ -124,13 +126,14 @@ public class CancelamentoController implements Initializable {
             // ERRO_VALIDACAO: nenhum critério informado. NAO_ENCONTRADO: FA01.
             tableReservas.getItems().clear();
             limparDetalhes();
-            exibirMensagemPesquisa(resultado.mensagensConsolidadas());
+            exibirMensagemPesquisa(resultado.mensagensConsolidadas(), true);
             return;
         }
 
         List<ResumoReserva> encontradas = resultado.getDado().orElse(List.of());
         tableReservas.setItems(FXCollections.observableArrayList(encontradas));
         tableReservas.getSelectionModel().selectFirst();
+        exibirMensagemPesquisa(encontradas.size() + " reserva(s) encontrada(s).", false);
     }
 
     /** Refaz a pesquisa atual mantendo a reserva em foco, quando ela ainda aparecer. */
@@ -225,6 +228,14 @@ public class CancelamentoController implements Initializable {
         }
 
         Reserva reserva = selecionada.reserva();
+        var errosMotivo = contexto.getReservaController()
+                .validarMotivoCancelamento(cboMotivo.getValue(), txtDescricaoMotivo.getText());
+        if (!errosMotivo.isEmpty()) {
+            Resultado<ResumoReserva> validacao = Resultado.erroValidacao(errosMotivo);
+            Alertas.marcarErro(cboMotivo, lblErroMotivo, validacao, "motivo");
+            Alertas.marcarErro(txtDescricaoMotivo, lblErroDescricao, validacao, "descricao");
+            return;
+        }
         int vagas = contexto.getReservaController().vagasQueSeraoDevolvidas(reserva);
 
         // Passo 7: confirmação informando quantas vagas voltam ao pacote.
@@ -324,7 +335,9 @@ public class CancelamentoController implements Initializable {
         limparErros();
     }
 
-    private void exibirMensagemPesquisa(String mensagem) {
+    private void exibirMensagemPesquisa(String mensagem, boolean erro) {
+        lblMensagemPesquisa.getStyleClass().removeAll("mensagem-erro", "texto-secundario");
+        lblMensagemPesquisa.getStyleClass().add(erro ? "mensagem-erro" : "texto-secundario");
         lblMensagemPesquisa.setText(mensagem);
         lblMensagemPesquisa.setVisible(true);
         lblMensagemPesquisa.setManaged(true);

@@ -1,6 +1,7 @@
 package com.tripcontrol.controller;
 
 import com.tripcontrol.controller.dto.DadosReserva;
+import com.tripcontrol.controller.dto.PacoteComVagas;
 import com.tripcontrol.controller.dto.ResumoFinanceiro;
 import com.tripcontrol.controller.dto.ResumoReserva;
 import com.tripcontrol.model.Cancelamento;
@@ -8,6 +9,7 @@ import com.tripcontrol.model.Cliente;
 import com.tripcontrol.model.MotivoCancelamento;
 import com.tripcontrol.model.Pacote;
 import com.tripcontrol.model.Reserva;
+import com.tripcontrol.model.SituacaoPacote;
 import com.tripcontrol.model.StatusReserva;
 import com.tripcontrol.repository.ClienteRepository;
 import com.tripcontrol.repository.PacoteRepository;
@@ -120,10 +122,25 @@ public class ReservaController {
         // mesmas vagas livres e juntas ultrapassar a capacidade.
         return Conexoes.emTransacao(() -> {
             pacoteRepository.bloquearParaAtualizacao(pacote.getId());
+            Optional<Pacote> pacoteAtual = pacoteRepository.buscarPorId(pacote.getId());
+            if (pacoteAtual.isEmpty()) {
+                return Resultado.naoEncontrado("Pacote nao localizado. Atualize a lista e tente novamente.");
+            }
+            Pacote pacoteParaReserva = pacoteAtual.get();
+            PacoteComVagas vagasAtuais = pacoteController.comVagas(pacoteParaReserva);
+            if (vagasAtuais.situacao() == SituacaoPacote.ENCERRADO) {
+                return Resultado.erroValidacao("pacote",
+                        "Este pacote ja foi encerrado. Selecione outro pacote para a reserva.");
+            }
+            if (!pacoteParaReserva.contemPeriodo(inicio.get(), fim.get())) {
+                return Resultado.erroValidacao("dataInicio",
+                        "Periodo incompativel com o pacote. Datas validas: "
+                                + Formatadores.formatarData(pacoteParaReserva.getDataInicio()) + " a "
+                                + Formatadores.formatarData(pacoteParaReserva.getDataFim()) + ".");
+            }
 
             // FA01 - vagas insuficientes (recalculadas agora, nao no carregamento da tela).
-            int ocupadas = pacoteController.vagasOcupadas(pacote.getId());
-            int disponiveis = pacote.vagasDisponiveis(ocupadas);
+            int disponiveis = vagasAtuais.vagasDisponiveis();
             if (quantidade.get() > disponiveis) {
                 return Resultado.erroValidacao("quantidadeViajantes",
                         "Vagas insuficientes para o pacote selecionado (Vagas disponiveis: "
@@ -133,14 +150,18 @@ public class ReservaController {
             Reserva reserva = new Reserva(cliente.get().getId(), pacote.getId(), quantidade.get(),
                     inicio.get(), fim.get(), Formatadores.textoOuNulo(dados.observacoes()));
             reserva.setCodigo(reservaRepository.proximoCodigo());
-            reserva.setValorTotal(calcularValorTotal(pacote, quantidade.get()));
+            reserva.setValorTotal(calcularValorTotal(pacoteParaReserva, quantidade.get()));
             reservaRepository.salvar(reserva);
 
-            ResumoReserva resumo = new ResumoReserva(reserva, cliente.get(), pacote);
+            ResumoReserva resumo = new ResumoReserva(reserva, cliente.get(), pacoteParaReserva);
             return Resultado.sucesso(resumo,
-                    "Reserva " + reserva.getCodigo() + " confirmada para " + cliente.get().getNome()
-                            + " - " + quantidade.get() + " viajante(s), total "
-                            + Formatadores.formatarMoeda(reserva.getValorTotal()) + ".");
+                    "Reserva confirmada.\n\nCódigo: " + reserva.getCodigo()
+                            + "\nCliente: " + cliente.get().getNome()
+                            + "\nPacote: " + pacoteParaReserva.getCodigo() + " - " + pacoteParaReserva.getDestino()
+                            + "\nPeríodo: " + Formatadores.formatarData(inicio.get()) + " a "
+                            + Formatadores.formatarData(fim.get())
+                            + "\nViajantes: " + quantidade.get()
+                            + "\nTotal: " + Formatadores.formatarMoeda(reserva.getValorTotal()));
         });
     }
 
@@ -255,6 +276,18 @@ public class ReservaController {
         return reserva.isAtiva() ? reserva.getQuantidadeViajantes() : 0;
     }
 
+    /** Validacao compartilhada pelo formulario e pela gravacao do cancelamento (UC07, FA03). */
+    public List<ErroValidacao> validarMotivoCancelamento(MotivoCancelamento motivo, String descricao) {
+        if (motivo == null) {
+            return List.of(new ErroValidacao("motivo", "Selecione o motivo do cancelamento."));
+        }
+        if (motivo.isExigeDescricao() && Formatadores.textoOuNulo(descricao) == null) {
+            return List.of(new ErroValidacao("descricao",
+                    "Descreva o motivo informado pelo passageiro quando a opcao for \"Outro\"."));
+        }
+        return List.of();
+    }
+
     /**
      * Efetiva o cancelamento de uma reserva ativa (UC07, passos 8 a 10).
      *
@@ -286,14 +319,11 @@ public class ReservaController {
         }
 
         // FA03 - motivo ausente ou "Outro" sem a descricao obrigatoria.
-        if (motivo == null) {
-            return Resultado.erroValidacao("motivo", "Selecione o motivo do cancelamento.");
+        List<ErroValidacao> errosMotivo = validarMotivoCancelamento(motivo, descricao);
+        if (!errosMotivo.isEmpty()) {
+            return Resultado.erroValidacao(errosMotivo);
         }
         String descricaoLimpa = Formatadores.textoOuNulo(descricao);
-        if (motivo.isExigeDescricao() && descricaoLimpa == null) {
-            return Resultado.erroValidacao("descricao",
-                    "Descreva o motivo informado pelo passageiro quando a opcao for \"Outro\".");
-        }
 
         // FA05 - a reserva mudou depois que a tela a carregou.
         if (reserva.getVersao() != versaoConhecida) {

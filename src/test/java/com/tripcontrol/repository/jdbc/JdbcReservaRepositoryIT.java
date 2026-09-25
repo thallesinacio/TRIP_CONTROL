@@ -1,5 +1,10 @@
 package com.tripcontrol.repository.jdbc;
 
+import com.tripcontrol.controller.CalculadoraFinanceira;
+import com.tripcontrol.controller.PacoteController;
+import com.tripcontrol.controller.ReservaController;
+import com.tripcontrol.controller.StatusResultado;
+import com.tripcontrol.controller.dto.DadosReserva;
 import com.tripcontrol.model.Cancelamento;
 import com.tripcontrol.model.Cliente;
 import com.tripcontrol.model.MotivoCancelamento;
@@ -18,6 +23,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.time.Clock;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,6 +77,24 @@ class JdbcReservaRepositoryIT extends RepositorioJdbcIT {
         assertEquals(LocalDate.of(2026, 4, 19), lida.getDataFim());
         assertEquals(StatusReserva.ATIVA, lida.getStatus());
         assertNull(lida.getCancelamento());
+    }
+
+    @Test
+    @DisplayName("UC03: a gravacao JDBC recusa pacote encerrado sem criar reserva")
+    void recusaReservaDePacoteEncerrado() {
+        Clock depoisDoPacote = Clock.fixed(LocalDate.of(2026, 4, 20)
+                .atStartOfDay(ZoneOffset.UTC).toInstant(), ZoneOffset.UTC);
+        PacoteController controlePacotes = new PacoteController(pacotes, reservas, depoisDoPacote);
+        ReservaController controleReservas = new ReservaController(reservas, pacotes, clientes,
+                new CalculadoraFinanceira(new JdbcParcelaRepository(), new JdbcPagamentoRepository(),
+                        depoisDoPacote), controlePacotes);
+
+        var resultado = controleReservas.registrar(new DadosReserva(cliente.getId(), pacote.getId(),
+                "2", "12/04/2026", "19/04/2026", null));
+
+        assertEquals(StatusResultado.ERRO_VALIDACAO, resultado.getStatus());
+        assertTrue(resultado.mensagemDoCampo("pacote").orElseThrow().contains("encerrado"));
+        assertTrue(reservas.buscarPorPacote(pacote.getId()).isEmpty());
     }
 
     @Test

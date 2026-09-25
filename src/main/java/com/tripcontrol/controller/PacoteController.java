@@ -5,6 +5,7 @@ import com.tripcontrol.controller.dto.PacoteComVagas;
 import com.tripcontrol.model.AlteracaoCapacidade;
 import com.tripcontrol.model.Pacote;
 import com.tripcontrol.model.Reserva;
+import com.tripcontrol.model.SituacaoPacote;
 import com.tripcontrol.repository.PacoteRepository;
 import com.tripcontrol.repository.ReservaRepository;
 import com.tripcontrol.util.Conexoes;
@@ -157,7 +158,7 @@ public class PacoteController {
     /** Pacotes que ainda aceitam reservas, usados no combo da tela de reservas. */
     public List<Pacote> listarDisponiveis() {
         return listarComVagas().stream()
-                .filter(linha -> linha.vagasDisponiveis() > 0)
+                .filter(linha -> linha.situacao() == SituacaoPacote.DISPONIVEL)
                 .map(PacoteComVagas::pacote)
                 .toList();
     }

@@ -108,6 +108,15 @@ class ReservaCancelamentoTest {
         return resultado.getDado().orElseThrow().reserva();
     }
 
+    @Test
+    @DisplayName("UC07: motivo e descricao sao validados antes da confirmacao")
+    void validaMotivoAntesDaConfirmacao() {
+        assertEquals("motivo", controller.validarMotivoCancelamento(null, null).getFirst().campo());
+        assertEquals("descricao", controller.validarMotivoCancelamento(
+                MotivoCancelamento.OUTRO, "  ").getFirst().campo());
+        assertTrue(controller.validarMotivoCancelamento(MotivoCancelamento.OUTRO, "Mudanca de planos").isEmpty());
+    }
+
     // ------------------------------------------------------------------
     // Fluxo principal
     // ------------------------------------------------------------------

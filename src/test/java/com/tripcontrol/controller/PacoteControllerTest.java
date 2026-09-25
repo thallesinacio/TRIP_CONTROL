@@ -150,6 +150,21 @@ class PacoteControllerTest {
     }
 
     @Test
+    @DisplayName("UC03: lista de reserva exclui pacotes lotados e encerrados")
+    void listaSomentePacotesQueAceitamReservas() {
+        Pacote disponivel = controller.cadastrar(dadosValidos()).getDado().orElseThrow();
+        Pacote lotado = controller.cadastrar(new DadosPacote("Recife, PE", "05/06/2026", "12/06/2026",
+                null, "1000,00", "2", null)).getDado().orElseThrow();
+        registrarReserva(lotado, 2);
+        Pacote encerrado = new Pacote("Salvador, BA", HOJE.minusDays(8), HOJE.minusDays(1),
+                null, new BigDecimal("1000.00"), 10, null);
+        encerrado.setCodigo(pacoteRepository.proximoCodigo());
+        pacoteRepository.salvar(encerrado);
+
+        assertEquals(java.util.List.of(disponivel), controller.listarDisponiveis());
+    }
+
+    @Test
     @DisplayName("UC04 FA03: nova capacidade menor que as vagas ocupadas e recusada")
     void recusaCapacidadeAbaixoDoOcupado() {
         Pacote pacote = controller.cadastrar(dadosValidos()).getDado().orElseThrow();
